@@ -1,0 +1,79 @@
+<!--
+  RoadPro download section for www.exceltokml.com
+  Paste this block into the page (HTML / "Custom HTML" widget). It is self-contained:
+  its styles only apply inside #roadpro-download, and the version number and date
+  are read live from GitHub, so the section never needs editing for a new version.
+  The download button always gives the newest setup.
+-->
+<section id="roadpro-download">
+  <style>
+    #roadpro-download { --ink:#1E2228; --amber:#F2A900; --muted:#5f6670; --line:#e6e1d6;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); max-width: 980px; margin: 32px auto; padding: 0 16px; }
+    #roadpro-download .rp-card { display: grid; grid-template-columns: 1.25fr 1fr; gap: 0; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--line); background: #fff; box-shadow: 0 8px 30px rgba(30,34,40,.08); }
+    #roadpro-download .rp-main { padding: 32px 32px 28px; }
+    #roadpro-download .rp-side { background: var(--ink); color: #dfe3e8; padding: 32px 28px; }
+    #roadpro-download .rp-kicker { font-size: 12px; letter-spacing: .18em; color: #b07c00; font-weight: 700; text-transform: uppercase; margin: 0 0 6px; }
+    #roadpro-download h2 { font-size: 30px; line-height: 1.15; margin: 0 0 10px; }
+    #roadpro-download p { margin: 0 0 14px; line-height: 1.55; color: var(--muted); }
+    #roadpro-download .rp-badge { display: inline-block; background: #fff4d6; color: #8a6200; border-radius: 99px; padding: 3px 12px;
+      font-size: 13px; font-weight: 600; margin-bottom: 18px; }
+    #roadpro-download .rp-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 14px; }
+    #roadpro-download a.rp-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 15px;
+      border-radius: 8px; padding: 12px 20px; border: 1px solid transparent; }
+    #roadpro-download a.rp-primary { background: var(--amber); color: var(--ink); border-color: #c98b00; }
+    #roadpro-download a.rp-primary:hover { filter: brightness(.95); }
+    #roadpro-download a.rp-secondary { background: #fff; color: var(--ink); border-color: var(--line); }
+    #roadpro-download a.rp-secondary:hover { background: #f7f5f0; }
+    #roadpro-download .rp-small { font-size: 13px; color: var(--muted); }
+    #roadpro-download .rp-side h3 { color: #fff; font-size: 16px; margin: 0 0 12px; }
+    #roadpro-download ul { margin: 0 0 18px; padding-left: 18px; }
+    #roadpro-download li { margin: 0 0 7px; line-height: 1.45; }
+    #roadpro-download .rp-side a { color: #F2B33D; }
+    @media (max-width: 760px) { #roadpro-download .rp-card { grid-template-columns: 1fr; } #roadpro-download .rp-main, #roadpro-download .rp-side { padding: 24px 20px; } }
+  </style>
+
+  <div class="rp-card">
+    <div class="rp-main">
+      <p class="rp-kicker">AutoCAD &amp; Civil 3D plugin</p>
+      <h2>RoadPro &mdash; road builder for AutoCAD</h2>
+      <span class="rp-badge" id="rp-version">Latest version</span>
+      <p>Roads, junctions, 2 / 3 / 4-way roundabouts, corridor, pavement, markings, signs and professional cross sections &mdash; built from one centre line.</p>
+
+      <div class="rp-btns">
+        <a class="rp-btn rp-primary" href="https://github.com/Asjad-Mehmood/Road-pro/releases/latest/download/RoadPro_Setup.exe">&#11015; Download for Windows</a>
+        <a class="rp-btn rp-secondary" href="https://github.com/Asjad-Mehmood/Road-pro/releases" target="_blank" rel="noopener">What's new</a>
+        <a class="rp-btn rp-secondary" href="https://github.com/Asjad-Mehmood/Road-pro/raw/main/docs/RoadPro_v3.6_User_Guide.pdf" target="_blank" rel="noopener">User guide (PDF)</a>
+      </div>
+
+      <p class="rp-small">Free &middot; Works with AutoCAD 2013 or newer, Civil 3D and Map 3D (not AutoCAD LT) &middot; Windows 10 / 11 &middot; No administrator rights needed.</p>
+      <p class="rp-small">If Windows shows <em>&ldquo;Windows protected your PC&rdquo;</em>, click <b>More info &rarr; Run anyway</b>.</p>
+    </div>
+
+    <div class="rp-side">
+      <h3>Install once &mdash; updates arrive by themselves</h3>
+      <ul>
+        <li>Run <b>RoadPro_Setup.exe</b>: it installs RoadPro Hub and the AutoCAD plugin.</li>
+        <li>Start AutoCAD and type <b>RDP</b> to build a road, <b>RDHELP</b> for all commands.</li>
+        <li>New versions are offered automatically; AutoCAD shows a notice and <b>RDHUB</b> updates in one click.</li>
+        <li>Every update is checked (SHA-256) before it is installed.</li>
+      </ul>
+      <p class="rp-small" style="color:#9aa3ad">Developed by <a href="https://www.exceltokml.com/">exceltokml.com</a> &middot; SurveyX Digital<br/>
+        Source: <a href="https://github.com/Asjad-Mehmood/Road-pro" target="_blank" rel="noopener">github.com/Asjad-Mehmood/Road-pro</a></p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // show the newest version and its date (from GitHub); the section still works if this fails
+      fetch("https://api.github.com/repos/Asjad-Mehmood/Road-pro/releases/latest")
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (rel) {
+          if (!rel || !rel.tag_name) return;
+          var d = rel.published_at ? new Date(rel.published_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "";
+          document.getElementById("rp-version").textContent = "Version " + rel.tag_name.replace(/^v/, "") + (d ? "  ·  " + d : "");
+        })
+        .catch(function () {});
+    })();
+  </script>
+</section>
