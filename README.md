@@ -1,0 +1,76 @@
+<p align="center">
+  <img src="hub/src/RoadPro.Hub/Assets/RoadPro_256.png" width="96" alt="RoadPro" />
+</p>
+
+<h1 align="center">RoadPro</h1>
+<p align="center"><b>Road builder for AutoCAD and Civil 3D</b><br/>
+Roads, junctions, roundabouts, corridor, pavement, markings, signs and cross sections, from one centre line.</p>
+
+---
+
+## Download
+
+Get **RoadPro_Setup_vX.Y.Z.exe** from the [Releases](https://github.com/Asjad-Mehmood/Road-pro/releases) page and run it.
+No administrator rights are needed. The setup installs **RoadPro Hub** and the AutoCAD plugin.
+
+**Works with:** AutoCAD 2013 or newer, Civil 3D, Map 3D and other AutoCAD-based programs (not AutoCAD LT), on Windows 7 SP1 / 10 / 11 with .NET Framework 4.8.
+
+## RoadPro Hub
+
+A small Windows app that looks after RoadPro:
+
+- installs, updates, repairs and uninstalls the AutoCAD plugin in one click
+- keeps the previous version as a backup, so you can go back
+- lists the AutoCAD / Civil 3D versions on the computer
+- opens the user guide, shortcut keys, what's new and the test report
+
+After installing, start AutoCAD: RoadPro loads in every drawing. Type `RDP` to build a road and `RDHELP` for all commands.
+
+## Repository layout
+
+| Folder | What is inside |
+|---|---|
+| `plugin/RoadPro.bundle` | the AutoCAD plugin (Autodesk ApplicationPlugins bundle): `RoadPro.lsp`, `RP_PAVER.pat`, `PackageContents.xml` |
+| `hub/` | RoadPro Hub (C#): `RoadPro.Hub` WPF app (.NET Framework 4.8), `RoadPro.Hub.Core` logic library, unit tests |
+| `installer/` | Inno Setup script for `RoadPro_Setup.exe`, wizard art, licence terms |
+| `docs/` | user guide, shortcut keys, what's new, test report |
+| `.github/workflows` | builds and tests everything on Windows for every push |
+| `version.txt` | the one version number for plugin, Hub and setup |
+
+## Build
+
+Every push to `main` builds the setup on GitHub Actions (Windows). The run:
+
+1. checks that `version.txt`, `PackageContents.xml` and `RoadPro.lsp` show the same version
+2. runs the Hub unit tests
+3. builds RoadPro Hub and installs / uninstalls the plugin from the command line
+4. builds `RoadPro_Setup_vX.Y.Z.exe` with Inno Setup, then installs and uninstalls it silently
+5. attaches the setup to the run (Actions -> the run -> Artifacts)
+
+**Publishing a release:** update `version.txt`, `PackageContents.xml` and `docs/`, then push a tag such as `v3.6.0`.
+The setup is attached to a new GitHub Release automatically.
+
+Local build on Windows: Visual Studio 2022 (".NET desktop development"), open `hub/RoadProHub.sln`; then
+`ISCC.exe /DAppVersion=3.6.0 installer\RoadProHub.iss` with Inno Setup 6.
+
+Command line (used by the setup):
+
+```
+RoadProHub.exe /installplugin [/quiet]     install / update the plugin
+RoadProHub.exe /uninstallplugin [/quiet]   remove the plugin
+```
+
+## Roadmap
+
+- [x] **Phase 1:** RoadPro Hub app and setup program
+- [ ] **Phase 2:** automatic updates (Hub and plugin)
+- [ ] **Phase 3:** code protection and licence (optional)
+- [ ] **Phase 4:** beta test and launch
+
+## Licence
+
+Copyright © 2026 [exceltokml.com](https://www.exceltokml.com/). All rights reserved.
+The source is published so it can be read and checked. RoadPro is free to use; see [installer/EULA.txt](installer/EULA.txt).
+Redistribution or publishing modified copies needs written permission.
+
+Developed by [www.exceltokml.com](https://www.exceltokml.com/) · SurveyX Digital

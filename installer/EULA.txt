@@ -1,0 +1,21 @@
+ROADPRO - LICENCE TERMS
+Copyright (C) 2026 exceltokml.com. All rights reserved.
+
+1. You may install and use RoadPro and RoadPro Hub free of charge, for
+   personal and commercial road design work, on any number of computers.
+
+2. You may not sell, rent or redistribute RoadPro, or publish modified
+   copies of it, without written permission from exceltokml.com.
+
+3. RoadPro draws geometry to help the designer. Every design must be
+   checked by a qualified engineer against the project's own standards
+   before it is used for construction.
+
+4. RoadPro is provided "as is", without warranty of any kind. exceltokml.com
+   is not liable for any loss or damage arising from its use.
+
+5. RoadPro Hub only changes files in your own user profile (the Autodesk
+   ApplicationPlugins folder and its own folders). It does not collect or
+   send any personal data.
+
+Developed by https://www.exceltokml.com/

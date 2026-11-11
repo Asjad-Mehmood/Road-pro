@@ -1,0 +1,112 @@
+name: Build RoadPro setup
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Read version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (Get-Content version.txt -Raw).Trim()
+          if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "version.txt must look like 3.6.0 (found '$v')" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "short=$($v -replace '\.0$', '')" >> $env:GITHUB_OUTPUT
+          Write-Host "RoadPro version $v"
+
+      - name: Check versions match
+        shell: pwsh
+        run: |
+          $v = '${{ steps.ver.outputs.version }}'
+          [xml]$pc = Get-Content plugin/RoadPro.bundle/PackageContents.xml
+          if ($pc.ApplicationPackage.AppVersion -ne $v) { throw "PackageContents.xml AppVersion is $($pc.ApplicationPackage.AppVersion), version.txt is $v" }
+          $lsp = Get-Content plugin/RoadPro.bundle/Contents/RoadPro.lsp -Raw
+          $short = ($v -replace '\.0$', '')
+          if ($lsp -notmatch ('\(setq \*rp:ver\* "' + [regex]::Escape($short) + '"\)')) { throw "RoadPro.lsp *rp:ver* is not $short" }
+          if ("${{ github.ref }}" -like "refs/tags/v*" -and "${{ github.ref_name }}" -ne "v$v") { throw "Tag ${{ github.ref_name }} does not match version.txt ($v)" }
+          Write-Host "All versions are $v"
+
+      - name: Unit tests
+        run: dotnet test hub/tests/RoadPro.Hub.Core.Tests/RoadPro.Hub.Core.Tests.csproj -c Release --logger "console;verbosity=normal"
+
+      - name: Build RoadPro Hub
+        run: dotnet publish hub/src/RoadPro.Hub/RoadPro.Hub.csproj -c Release -o build/hub -p:Version=${{ steps.ver.outputs.version }}
+
+      - name: Smoke test (install / uninstall the plugin from the command line)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/hub/payload | Out-Null
+          Copy-Item -Recurse -Force plugin/RoadPro.bundle build/hub/payload/
+          $target = Join-Path $env:APPDATA 'Autodesk\ApplicationPlugins\RoadPro.bundle'
+          $p = Start-Process build/hub/RoadProHub.exe -ArgumentList '/installplugin','/quiet' -Wait -PassThru
+          if ($p.ExitCode -ne 0 -or -not (Test-Path "$target\Contents\RoadPro.lsp")) { Get-Content "$env:LOCALAPPDATA\RoadPro Hub\logs\RoadProHub.log" -ErrorAction SilentlyContinue; throw "install failed ($($p.ExitCode))" }
+          $p = Start-Process build/hub/RoadProHub.exe -ArgumentList '/uninstallplugin','/quiet' -Wait -PassThru
+          if ($p.ExitCode -ne 0 -or (Test-Path $target)) { throw "uninstall failed ($($p.ExitCode))" }
+          Remove-Item -Recurse -Force build/hub/payload
+          Get-Content "$env:LOCALAPPDATA\RoadPro Hub\logs\RoadProHub.log"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          if (-not (Test-Path $iscc)) { throw "Inno Setup not found" }
+
+      - name: Build setup
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.ver.outputs.version }}" installer/RoadProHub.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+          Get-ChildItem installer/Output
+
+      - name: Test the setup (silent install, check, silent uninstall)
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem installer/Output/*.exe | Select-Object -First 1
+          $p = Start-Process $setup.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/LOG=setup.log' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content setup.log; throw "setup failed ($($p.ExitCode))" }
+          $app = Join-Path $env:LOCALAPPDATA 'Programs\RoadPro Hub'
+          $target = Join-Path $env:APPDATA 'Autodesk\ApplicationPlugins\RoadPro.bundle'
+          foreach ($f in "$app\RoadProHub.exe", "$app\payload\RoadPro.bundle\PackageContents.xml", "$target\Contents\RoadPro.lsp", "$target\Contents\Docs") {
+            if (-not (Test-Path $f)) { Get-Content setup.log; throw "missing after setup: $f" }
+          }
+          $un = Get-ChildItem "$app\unins*.exe" | Select-Object -First 1
+          $p = Start-Process $un.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
+          # the uninstaller re-launches itself from %TEMP%; wait for it to finish
+          for ($i = 0; $i -lt 60 -and ((Test-Path $target) -or (Test-Path "$app\RoadProHub.exe")); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path $target) { throw "plugin still installed after uninstall" }
+          if (Test-Path "$app\RoadProHub.exe") { throw "Hub still installed after uninstall" }
+          Write-Host "Setup install / uninstall OK"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RoadPro_Setup_v${{ steps.ver.outputs.version }}
+          path: installer/Output/*.exe
+          if-no-files-found: error
+
+      - name: Publish release (tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: RoadPro ${{ steps.ver.outputs.version }}
+          body_path: docs/RoadPro_v${{ steps.ver.outputs.short }}_WhatsNew.txt
+          files: installer/Output/*.exe

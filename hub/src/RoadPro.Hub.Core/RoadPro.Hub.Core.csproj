@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>RoadPro.Hub.Core</RootNamespace>
+    <AssemblyName>RoadPro.Hub.Core</AssemblyName>
+    <Company>exceltokml.com</Company>
+    <Product>RoadPro Hub</Product>
+    <Copyright>Copyright © 2026 exceltokml.com</Copyright>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    RoadPro Hub - Windows desktop app (WPF) on .NET Framework 4.8.
+    .NET Framework 4.8 is part of Windows 10 / 11, so users need no extra runtime
+    and the setup stays small. Built on Windows (GitHub Actions or Visual Studio).
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>RoadPro.Hub</RootNamespace>
+    <AssemblyName>RoadProHub</AssemblyName>
+    <ApplicationIcon>Assets\RoadPro.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>3.6.0</Version>
+    <Company>exceltokml.com</Company>
+    <Product>RoadPro Hub</Product>
+    <Description>Installs, updates and manages RoadPro for AutoCAD and Civil 3D</Description>
+    <Copyright>Copyright © 2026 exceltokml.com</Copyright>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RoadPro.Hub.Core\RoadPro.Hub.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\RoadPro_256.png" />
+    <Resource Include="Assets\RoadPro.ico" />
+  </ItemGroup>
+
+</Project>

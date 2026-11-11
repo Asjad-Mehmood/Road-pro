@@ -1,0 +1,139 @@
+<Window x:Class="RoadPro.Hub.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RoadPro Hub" Width="1000" Height="680" MinWidth="880" MinHeight="580"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource Paper}"
+        Icon="Assets/RoadPro.ico" FontFamily="Segoe UI" FontSize="13"
+        TextOptions.TextFormattingMode="Display" UseLayoutRounding="True">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ============ side panel ============ -->
+        <Border Grid.Column="0" Background="{StaticResource Ink}">
+            <DockPanel Margin="24,28,20,22" LastChildFill="True">
+                <StackPanel DockPanel.Dock="Top">
+                    <Image Source="Assets/RoadPro_256.png" Width="72" Height="72" HorizontalAlignment="Left"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+                    <TextBlock Text="RoadPro Hub" Foreground="White" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0" />
+                    <TextBlock x:Name="HubVersionText" Text="Version" Foreground="#9AA3AD" Margin="0,2,0,0" />
+                    <TextBlock Text="Road builder for AutoCAD and Civil 3D: roads, junctions, roundabouts, corridor, markings and sections."
+                               Foreground="#C9CED4" TextWrapping="Wrap" Margin="0,20,0,0" LineHeight="19" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <TextBlock Foreground="#9AA3AD" Text="Developed by" />
+                    <TextBlock Margin="0,2,0,0">
+                        <Hyperlink NavigateUri="https://www.exceltokml.com/" RequestNavigate="OnNavigate" Foreground="#F2B33D">www.exceltokml.com</Hyperlink>
+                    </TextBlock>
+                    <TextBlock Margin="0,12,0,0">
+                        <Hyperlink NavigateUri="https://github.com/Asjad-Mehmood/Road-pro/releases" RequestNavigate="OnNavigate" Foreground="#C9CED4">Releases on GitHub</Hyperlink>
+                    </TextBlock>
+                    <TextBlock Foreground="#7A828C" Text="SurveyX Digital" Margin="0,12,0,0" />
+                </StackPanel>
+                <Grid />
+            </DockPanel>
+        </Border>
+
+        <!-- ============ main ============ -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="30,26,30,20">
+
+                <!-- warning / info banner -->
+                <Border x:Name="Banner" Visibility="Collapsed" Background="{StaticResource WarnSoft}" BorderBrush="#F0D48A"
+                        BorderThickness="1" CornerRadius="8" Padding="16,10" Margin="0,0,0,16">
+                    <TextBlock x:Name="BannerText" TextWrapping="Wrap" Foreground="{StaticResource Warn}" />
+                </Border>
+
+                <!-- plugin card -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border x:Name="StatePill" DockPanel.Dock="Right" CornerRadius="12" Padding="12,4" VerticalAlignment="Top"
+                                    Background="{StaticResource GoodSoft}">
+                                <TextBlock x:Name="StateText" FontWeight="SemiBold" Foreground="{StaticResource Good}" Text="..." />
+                            </Border>
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource CardTitle}" Text="RoadPro plugin for AutoCAD" />
+                                <TextBlock x:Name="InstalledText" Foreground="{StaticResource InkSoft}" Margin="0,8,0,0" />
+                                <TextBlock x:Name="AvailableText" Foreground="{StaticResource InkSoft}" Margin="0,2,0,0" />
+                                <TextBlock x:Name="LocationText" Foreground="{StaticResource Muted}" FontSize="11.5" Margin="0,6,0,0" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DockPanel>
+
+                        <WrapPanel Margin="0,16,0,0">
+                            <Button x:Name="InstallButton" Style="{StaticResource PrimaryButton}" Content="Install" Click="OnInstall" />
+                            <Button x:Name="RepairButton" Style="{StaticResource SecondaryButton}" Content="Repair" Click="OnInstall" />
+                            <Button x:Name="UninstallButton" Style="{StaticResource SecondaryButton}" Content="Uninstall" Click="OnUninstall" />
+                            <Button x:Name="RestoreButton" Style="{StaticResource SecondaryButton}" Content="Restore previous version" Click="OnRestore" />
+                        </WrapPanel>
+
+                        <ProgressBar x:Name="Busy" IsIndeterminate="True" Height="4" Margin="0,14,0,0" Visibility="Collapsed"
+                                     Foreground="{StaticResource Amber}" Background="{StaticResource Line}" BorderThickness="0" />
+                        <TextBlock x:Name="ResultText" TextWrapping="Wrap" Margin="0,12,0,0" Visibility="Collapsed" />
+                    </StackPanel>
+                </Border>
+
+                <!-- AutoCAD card -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Refresh" MinWidth="0" Padding="12,4" Margin="0" Click="OnRefresh" />
+                            <TextBlock Style="{StaticResource CardTitle}" Text="AutoCAD on this computer" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <TextBlock x:Name="AcadEmpty" Visibility="Collapsed" Foreground="{StaticResource InkSoft}" TextWrapping="Wrap" Margin="0,10,0,0"
+                                   Text="No AutoCAD-based program was found. RoadPro needs AutoCAD 2013 or newer, Civil 3D, Map 3D or another AutoCAD-based program (not AutoCAD LT)." />
+                        <ItemsControl x:Name="AcadList" Margin="0,8,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="0,9">
+                                        <DockPanel>
+                                            <Border DockPanel.Dock="Right" CornerRadius="10" Padding="10,2" VerticalAlignment="Center" Background="{Binding BadgeBackground}">
+                                                <TextBlock Text="{Binding Badge}" Foreground="{Binding BadgeForeground}" FontWeight="SemiBold" FontSize="12" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource Ink}" />
+                                                <TextBlock Text="{Binding Detail}" Foreground="{StaticResource Muted}" FontSize="11.5" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- documents card -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource CardTitle}" Text="Documents and help" />
+                        <UniformGrid Columns="3" Margin="0,12,0,0">
+                            <Button x:Name="GuideButton" Style="{StaticResource DocButton}" Margin="0,0,10,10" Click="OnOpenDoc" Tag="*User_Guide*.pdf">
+                                <StackPanel><TextBlock Text="User guide" FontWeight="SemiBold" /><TextBlock Text="Step by step, with pictures (PDF)" FontWeight="Normal" Foreground="{StaticResource Muted}" FontSize="11.5" /></StackPanel>
+                            </Button>
+                            <Button x:Name="ShortcutsButton" Style="{StaticResource DocButton}" Margin="0,0,10,10" Click="OnOpenDoc" Tag="*Shortcuts*.xlsx">
+                                <StackPanel><TextBlock Text="Shortcut keys" FontWeight="SemiBold" /><TextBlock Text="All commands (Excel)" FontWeight="Normal" Foreground="{StaticResource Muted}" FontSize="11.5" /></StackPanel>
+                            </Button>
+                            <Button x:Name="NewsButton" Style="{StaticResource DocButton}" Margin="0,0,0,10" Click="OnOpenDoc" Tag="*WhatsNew*.txt">
+                                <StackPanel><TextBlock Text="What's new" FontWeight="SemiBold" /><TextBlock Text="Changes in this version" FontWeight="Normal" Foreground="{StaticResource Muted}" FontSize="11.5" /></StackPanel>
+                            </Button>
+                            <Button x:Name="ReportButton" Style="{StaticResource DocButton}" Margin="0,0,10,0" Click="OnOpenDoc" Tag="*Test_Report*.pdf">
+                                <StackPanel><TextBlock Text="Test report" FontWeight="SemiBold" /><TextBlock Text="What was tested (PDF)" FontWeight="Normal" Foreground="{StaticResource Muted}" FontSize="11.5" /></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource DocButton}" Margin="0,0,10,0" Click="OnOpenPluginFolder">
+                                <StackPanel><TextBlock Text="Plugin folder" FontWeight="SemiBold" /><TextBlock Text="Where AutoCAD loads RoadPro" FontWeight="Normal" Foreground="{StaticResource Muted}" FontSize="11.5" /></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource DocButton}" Margin="0" Click="OnOpenLog">
+                                <StackPanel><TextBlock Text="Log file" FontWeight="SemiBold" /><TextBlock Text="For support questions" FontWeight="Normal" Foreground="{StaticResource Muted}" FontSize="11.5" /></StackPanel>
+                            </Button>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Foreground="{StaticResource Muted}" FontSize="11.5" TextWrapping="Wrap" Margin="2,0,0,0"
+                           Text="After installing, start AutoCAD or Civil 3D: RoadPro loads in every drawing. Type RDP to build a road, RDHELP for all commands." />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

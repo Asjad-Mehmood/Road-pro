@@ -1,0 +1,65 @@
+ROADPRO v3.6  -  Road Builder for AutoCAD / Civil 3D            11-Nov-2026
+Developed by https://www.exceltokml.com/
+=============================================================================
+
+INSTALL
+  Add-in (recommended) : unzip RoadPro_v3.6_AddIn.zip, close AutoCAD and
+  double-click Install_RoadPro.bat. It replaces v3.5 by itself.
+  APPLOAD method : load RoadPro.lsp ONE time - it installs itself.
+  Roads built with v3.5 keep working. Run RDB once on a road with
+  junctions to get the v3.6 clean tie-in.
+
+WHAT IS NEW IN v3.6  (fixes from the error report + new features)
+  1. Clean tie-in at junctions (RDJ)
+     - The side road now starts where the kerb returns end. Its own surface,
+       edges, shoulders and barricades no longer run into the main road.
+     - ONE mouth surface hatch, joined to the main road hatch : no overlap,
+       no black wedges (also on skewed 60 / 120 degree junctions).
+     - Shoulder bands of the main road are cut at the mouth; barricades and
+       red / white edge lines adjust to the kerb returns.
+     - Sidewalk / walkway / drain strips meet the corner pieces exactly,
+       also with an auxiliary lane (J1-AUX) and an island.
+     - Corner hatch pattern follows the through road and is drawn in pieces
+       of about 25 m (no solid black fill on long corners).
+
+  2. Roundabouts on a road (RDRB)
+     - Layout : 2-way, 3-way (T) left, 3-way (T) right, 4-way (cross).
+     - Side road centre line : draw new, select existing, or AUTOMATIC
+       (straight, at 90 degrees, length you type - default 60 m).
+     - The main road surface, shoulders, barricades and edge lines are cut
+       at the ring - nothing runs into the roundabout any more.
+     - Side roads start at the end of the entry / exit fillets.
+     - FULL MARKING : edge lines on every approach and round every corner,
+       inner ring line, entry arrows, yield lines and give-way triangles,
+       lane / spiral markings as the chosen standard.
+
+  3. Edit a curve - barricades follow (RDER, grips, live update)
+     After a grip edit the bend is refitted TANGENT at its radius, so the
+     barricades, edges and corridor follow cleanly (no crossing units).
+
+  4. Move a centre line - everything follows
+     Junction and roundabout side roads keep their start on the moved road
+     (RDB and live update), with the same clean mouth.
+
+  5. Cross section (RDX) - professional
+     - Drawn only up to the CORRIDOR LIMIT (outer edge of the utility /
+       drain / walkway), with a corridor limit line on each side.
+     - Dimension row 1 : every component with its name (LANE, SHOULDER,
+       BARRIER, SIDEWALK, WALKWAY, DRAIN, UTILITY, VERGE).
+       Row 2 : left roadside / carriageway / right roadside.
+       Row 3 : corridor width (limit to limit).
+       Architectural ticks on all dimensions.
+     - OFFSET / FINISHED LEVEL table under the section (levels relative to
+       the centre line finished level).
+     - Corridor item notes on staggered rows with leaders (no overlap with
+       the barrier and sign notes).
+
+  Everything else is unchanged from v3.5.
+
+TESTED
+  Full regression of v3.5 plus 34 new drawing checks on the cases of the
+  error report - see RoadPro_v3.6_Test_Report.pdf.
+
+ON HOLD
+  Own setup program and automatic updates : waiting for the decision with
+  Mr. Muhammad Abdullah.
