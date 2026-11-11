@@ -60,10 +60,10 @@ namespace RoadPro.Hub
             bool damaged = m.IsDamaged;
 
             InstalledText.Text = _installed != null
-                ? "Installed: RoadPro " + _installed.FriendlyVersion
+                ? "Installed: plugin v" + _installed.FriendlyVersion
                 : damaged ? "Installed: damaged (files missing) - use Repair" : "Installed: not yet";
             AvailableText.Text = _available != null
-                ? "In this Hub: RoadPro " + _available.FriendlyVersion
+                ? "In this Hub: plugin v" + _available.FriendlyVersion
                 : "In this Hub: plugin files missing - please run the setup again";
             LocationText.Text = m.TargetPath;
 
@@ -75,7 +75,7 @@ namespace RoadPro.Hub
                     break;
                 case PluginState.Older:
                     SetPill("Update available", "Warn");
-                    InstallButton.Content = "Update to " + _available.FriendlyVersion;
+                    InstallButton.Content = "Update to v" + _available.FriendlyVersion;
                     break;
                 case PluginState.Current:
                     SetPill("Up to date", "Good");
@@ -83,7 +83,7 @@ namespace RoadPro.Hub
                     break;
                 case PluginState.Newer:
                     SetPill("Newer than this Hub", "Good");
-                    InstallButton.Content = "Install " + (_available?.FriendlyVersion ?? "");
+                    InstallButton.Content = "Install v" + (_available?.FriendlyVersion ?? "");
                     break;
             }
 
@@ -158,7 +158,7 @@ namespace RoadPro.Hub
         {
             var latest = App.NewManager().ListBackups().Select(BundleInfo.TryRead).FirstOrDefault(b => b != null);
             if (latest == null) return;
-            var ask = MessageBox.Show(this, $"Go back to RoadPro {latest.FriendlyVersion} (the previous version)?",
+            var ask = MessageBox.Show(this, $"Go back to plugin v{latest.FriendlyVersion} (the previous version)?",
                                       "RoadPro Hub", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (ask != MessageBoxResult.Yes) return;
             await RunAsync(() => App.NewManager().RestoreLatestBackup());

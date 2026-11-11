@@ -16,7 +16,7 @@ namespace RoadPro.Hub
         internal static Logger Log { get; private set; }
         internal static UpdateService Updates { get; private set; }
 
-        /// <summary>Hub version = RoadPro version (one version.txt for plugin, Hub and setup).</summary>
+        /// <summary>Release version of RoadPro Hub and the setup (version.txt); the AutoCAD plugin has its own version in PackageContents.xml.</summary>
         internal static Version HubVersion
         {
             get

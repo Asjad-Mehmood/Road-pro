@@ -1,26 +1,37 @@
-ROADPRO v3.6.1  -  Road Builder for AutoCAD / Civil 3D          11-Nov-2026
+ROADPRO 1.0.0  -  Road Builder for AutoCAD / Civil 3D           11-Nov-2026
+First public release  |  AutoCAD plugin v3.6.1  |  RoadPro Hub 1.0
 Developed by https://www.exceltokml.com/
 =============================================================================
 
 INSTALL
-  Run RoadPro_Setup_v3.6.1.exe (from GitHub Releases). No administrator
-  rights needed. It installs RoadPro Hub and the AutoCAD plugin, and
-  replaces any older RoadPro by itself.
+  Run RoadPro_Setup.exe (download from www.exceltokml.com or GitHub
+  Releases). No administrator rights needed. It installs RoadPro Hub and
+  the AutoCAD plugin, and replaces any older RoadPro (v3.5 / v3.6) by itself.
+  Then start AutoCAD or Civil 3D and type RDP to build a road, RDHELP for
+  all commands.
 
-WHAT IS NEW IN v3.6.1  -  AUTOMATIC UPDATES
-  - RoadPro Hub checks GitHub Releases for a new RoadPro: when you open
-    it, and once a day when Windows starts (you can switch this off).
+  Version numbers: RoadPro 1.0.0 is the release (setup + RoadPro Hub).
+  The AutoCAD plugin inside keeps its own number: v3.6.1.
+
+WHAT IS NEW IN 1.0.0
+  RoadPro Hub - a Windows app that looks after RoadPro
+  - Install, update, repair or uninstall the AutoCAD plugin in one click;
+    the previous version is kept and can be restored.
+  - Lists the AutoCAD / Civil 3D versions on the computer.
+  - Opens the user guide, shortcut keys and this file.
+
+  Automatic updates
+  - RoadPro Hub checks for a new release when it opens, and once a day
+    when Windows starts (you can switch this off).
   - Update in one click: the setup is downloaded, checked (size and
     SHA-256 security code) and installed; the AutoCAD plugin is updated
-    too. The previous version is kept and can be restored.
-  - "Skip this version" if you do not want a particular update.
+    too. "Skip this version" if you do not want a particular update.
   - AutoCAD shows a notice at start-up when an update is waiting:
-      ** RoadPro 3.7 is available (you have 3.6.1).  Type RDHUB to update. **
-  - New command RDHUB (ROADPROHUB) opens RoadPro Hub: updates, repair,
-    user guide, shortcut keys.
+      ** RoadPro update 1.0.1 is available.  Type RDHUB to install it. **
+  - New command RDHUB (ROADPROHUB) opens RoadPro Hub.
 
 =============================================================================
-WHAT IS NEW IN v3.6  (fixes from the error report + new features)
+AUTOCAD PLUGIN v3.6  (fixes from the error report + new features)
   1. Clean tie-in at junctions (RDJ)
      - The side road now starts where the kerb returns end. Its own surface,
        edges, shoulders and barricades no longer run into the main road.
@@ -68,5 +79,8 @@ WHAT IS NEW IN v3.6  (fixes from the error report + new features)
   Everything else is unchanged from v3.5.
 
 TESTED
-  Full regression of v3.5 plus 34 new drawing checks on the cases of the
-  error report - see RoadPro_v3.6_Test_Report.pdf.
+  AutoCAD plugin: full regression of v3.5 plus 34 new drawing checks on the
+  cases of the error report - see RoadPro_Test_Report.pdf.
+  RoadPro Hub and setup: unit tests, and on every build a real Windows test
+  of install, automatic update to the next version, refusal of a tampered
+  update, and uninstall.

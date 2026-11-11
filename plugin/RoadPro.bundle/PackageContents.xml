@@ -2,7 +2,7 @@
 <ApplicationPackage SchemaVersion="1.0" AutodeskProduct="AutoCAD" ProductType="Application"
   Name="RoadPro" AppVersion="3.6.1" FriendlyVersion="3.6.1"
   Description="RoadPro - professional road builder for AutoCAD and Civil 3D (roads, junctions, roundabouts, corridor, markings, signs, concrete pavement, reports)"
-  Author="exceltokml.com" HelpFile="./Contents/Docs/RoadPro_v3.6.1_WhatsNew.txt"
+  Author="exceltokml.com" HelpFile="./Contents/Docs/RoadPro_WhatsNew.txt"
   ProductCode="{1BD9D2E3-6DF6-403D-ADB2-9039425F9C73}" UpgradeCode="{8E147A35-69F3-42C0-B34B-C953A99A2305}">
   <CompanyDetails Name="exceltokml.com" Url="https://www.exceltokml.com/" />
   <RuntimeRequirements OS="Win32|Win64" Platform="AutoCAD*" SeriesMin="R19.0" />

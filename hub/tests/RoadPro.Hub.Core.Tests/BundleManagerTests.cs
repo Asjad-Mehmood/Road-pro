@@ -49,13 +49,19 @@ namespace RoadPro.Hub.Core.Tests
     public class BundleManagerTests
     {
         [Fact]
-        public void Repo_bundle_is_valid_and_matches_version_txt()
+        public void Repo_bundle_is_valid_and_matches_the_lisp_version()
         {
             using var s = new Sandbox();
             var info = BundleInfo.TryRead(s.RepoBundle);
             Assert.NotNull(info);
+            // the plugin has its own version: PackageContents.xml must match *rp:ver* in RoadPro.lsp
+            var lsp = File.ReadAllText(Path.Combine(s.RepoBundle, "Contents", "RoadPro.lsp"));
+            var m = System.Text.RegularExpressions.Regex.Match(lsp, "\\(setq \\*rp:ver\\* \"([0-9.]+)\"\\)");
+            Assert.True(m.Success, "*rp:ver* not found in RoadPro.lsp");
+            Assert.Equal(VersionText.Parse(m.Groups[1].Value), info.Version);
+            // and the release version (version.txt) is a valid x.y.z
             var versionTxt = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..", "version.txt")).Trim();
-            Assert.Equal(VersionText.Parse(versionTxt), info.Version);
+            Assert.Matches("^\\d+\\.\\d+\\.\\d+$", versionTxt);
         }
 
         [Fact]

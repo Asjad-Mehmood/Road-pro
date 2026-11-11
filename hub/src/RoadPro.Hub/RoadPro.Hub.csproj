@@ -14,7 +14,7 @@
     <AssemblyName>RoadProHub</AssemblyName>
     <ApplicationIcon>Assets\RoadPro.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>3.6.0</Version>
+    <Version>1.0.0</Version>
     <Company>exceltokml.com</Company>
     <Product>RoadPro Hub</Product>
     <Description>Installs, updates and manages RoadPro for AutoCAD and Civil 3D</Description>

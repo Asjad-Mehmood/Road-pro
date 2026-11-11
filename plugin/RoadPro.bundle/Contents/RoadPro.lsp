@@ -9172,7 +9172,9 @@
     (setq la (cdr la) lb (cdr lb)))
   (if (and la lb) (> (car la) (car lb))))
 
-;; newer RoadPro waiting (from RoadPro Hub) -> "3.7" or nil
+;; RoadPro release waiting (from RoadPro Hub) -> "1.0.1" or nil.
+;; RoadPro Hub writes the file only while a newer release is waiting and
+;; clears it after the update (release numbers differ from *rp:ver*).
 (defun rp:update-waiting (/ d f h v)
   (if (and (setq d (rp:hub-dir))
            (setq f (findfile (strcat d "\\update-available.txt")))
@@ -9180,7 +9182,7 @@
     (progn
       (setq v (read-line h))
       (close h)
-      (if (and v (/= (vl-string-trim " \t\r\n" v) "") (rp:ver-newer v *rp:ver*))
+      (if (and v (/= (vl-string-trim " \t\r\n" v) ""))
         (vl-string-trim " \t\r\n" v)))))
 
 ;; one notice per AutoCAD session
@@ -9188,7 +9190,7 @@
   (if (and (setq v (rp:update-waiting)) (/= (vl-bb-ref '*rp:updnote*) v))
     (progn
       (vl-bb-set '*rp:updnote* v)
-      (princ (strcat "\n** RoadPro " v " is available (you have " *rp:ver* ").  Type RDHUB to update. **"))))
+      (princ (strcat "\n** RoadPro update " v " is available.  Type RDHUB to install it. **"))))
   (princ))
 
 (defun c:ROADPROHUB (/ exe)

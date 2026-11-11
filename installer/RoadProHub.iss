@@ -1,5 +1,5 @@
 ; RoadPro Hub - Windows setup (Inno Setup 6)
-; Build:  ISCC.exe /DAppVersion=3.6.0 installer\RoadProHub.iss
+; Build:  ISCC.exe /DAppVersion=1.0.0 installer\RoadProHub.iss
 ; Expects the published Hub in ..\build\hub (see .github/workflows/build.yml).
 
 #ifndef AppVersion
@@ -59,6 +59,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; plugin payload and docs are replaced as a whole on every update
 Type: filesandordirs; Name: "{app}\payload"
 Type: filesandordirs; Name: "{app}\docs"
+; an update installed by hand: the "update available" notice in AutoCAD is no longer true
+Type: files; Name: "{localappdata}\RoadPro Hub\update-available.txt"
 
 [Files]
 Source: "..\build\hub\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb,*.xml"
