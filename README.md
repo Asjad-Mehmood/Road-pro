@@ -10,7 +10,7 @@ Roads, junctions, roundabouts, corridor, pavement, markings, signs and cross sec
 
 ## Download
 
-Get **RoadPro_Setup_vX.Y.Z.exe** from the [Releases](https://github.com/Asjad-Mehmood/Road-pro/releases) page and run it.
+**[⬇ Download RoadPro (latest setup)](https://github.com/Asjad-Mehmood/Road-pro/releases/latest/download/RoadPro_Setup.exe)**, or pick a version on the [Releases](https://github.com/Asjad-Mehmood/Road-pro/releases) page, and run it.
 No administrator rights are needed. The setup installs **RoadPro Hub** and the AutoCAD plugin.
 
 **Works with:** AutoCAD 2013 or newer, Civil 3D, Map 3D and other AutoCAD-based programs (not AutoCAD LT), on Windows 7 SP1 / 10 / 11 with .NET Framework 4.8.

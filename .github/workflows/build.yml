@@ -217,13 +217,38 @@ jobs:
           }
           $m | ConvertTo-Json | Set-Content installer/Output/update.json -Encoding utf8
           Get-Content installer/Output/update.json
+          # fixed name for website links: .../releases/latest/download/RoadPro_Setup.exe
+          New-Item -ItemType Directory -Force release | Out-Null
+          Copy-Item $setup.FullName release/RoadPro_Setup.exe
+          Copy-Item $setup.FullName release/
+          Copy-Item installer/Output/update.json release/
+          $repo = "https://github.com/${{ github.repository }}"
+          $body = @(
+            "## RoadPro $v - Road builder for AutoCAD and Civil 3D",
+            "",
+            "**Download:** [RoadPro_Setup_v$v.exe]($repo/releases/download/v$v/$($setup.Name)) - run it, no administrator rights needed.",
+            "It installs **RoadPro Hub** and the AutoCAD plugin, and replaces any older RoadPro.",
+            "",
+            "Works with AutoCAD 2013 or newer, Civil 3D, Map 3D (not AutoCAD LT), Windows 10 / 11.",
+            "If Windows shows *Windows protected your PC*, click **More info -> Run anyway**.",
+            "",
+            "SHA-256: ``$($m.sha256)``",
+            "",
+            '```text',
+            $notes.TrimEnd(),
+            '```',
+            "",
+            "Developed by [www.exceltokml.com](https://www.exceltokml.com/)"
+          ) -join "`n"
+          Set-Content release/notes.md $body -Encoding utf8
 
       - name: Publish release (tags v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: RoadPro ${{ steps.ver.outputs.version }}
-          body_path: docs/RoadPro_v${{ steps.ver.outputs.short }}_WhatsNew.txt
+          body_path: release/notes.md
+          make_latest: true
           files: |
-            installer/Output/*.exe
-            installer/Output/update.json
+            release/*.exe
+            release/update.json
