@@ -1,6 +1,6 @@
 ;;;============================================================================
 ;;;  RoadPro.lsp  -  Professional Road Builder for AutoCAD
-;;;  Version : 3.6                                   Date : 11-Nov-2026
+;;;  Version : 3.6.1                                 Date : 11-Nov-2026
 ;;;  Developed by https://www.exceltokml.com/
 ;;;  Chainage inputs accept plain metres (100) or chainage format (0+100).
 ;;;  RDW / RDT with Both sides : left and right can use different chainages
@@ -90,6 +90,9 @@
 ;;;         CONCRETE PAVEMENT - earthwork, stone base, concrete slab, steel
 ;;;         (dowels, tie bars, mesh) : joints on plan, layers + steel in the
 ;;;         cross section, quantities in the report (RDPV).
+;;;  v3.6.1 : RoadPro Hub - automatic updates from GitHub Releases. When a
+;;;         new version is waiting, AutoCAD shows a notice at start-up;
+;;;         RDHUB opens RoadPro Hub (update, repair, user guide).
 ;;;  v3.6 : CLEAN TIE-IN - side roads now start where the kerb returns end;
 ;;;         ONE mouth surface hatch joins the main road hatch (no overlap,
 ;;;         no black wedges); shoulder bands and barricades are cut at the
@@ -161,7 +164,7 @@
 ;;;============================================================================
 (vl-load-com)
 
-(setq *rp:ver* "3.6")
+(setq *rp:ver* "3.6.1")
 
 (setq *rp:defaults*
   '(("rname"  . "ROAD-01") ("width"  . "7.30")  ("radius" . "10.0")  ("rref"   . "0")
@@ -228,7 +231,7 @@
 (setq *rp:dcl*
  (list
   "roadpro : dialog {"
-  "  label = \"ROAD PRO  -  Road Builder for AutoCAD / Civil 3D  v3.6\";"
+  "  label = \"ROAD PRO  -  Road Builder for AutoCAD / Civil 3D  v3.6.1\";"
   "  : row {"
   "    : boxed_column {"
   "      label = \"Road Geometry\";"
@@ -8865,6 +8868,7 @@
    ("RDLIVE"  "ROADLIVE"        "Live update on / off")
    ("RDLX"    "ROADLANDXML"     "LandXML export (Civil 3D)")
    ("RDLXI"   "ROADLANDXMLIN"   "LandXML import")
+   ("RDHUB"   "ROADPROHUB"      "RoadPro Hub : updates, repair, user guide")
    ("RDINSTALL" "ROADPROINSTALL" "Install permanently (Startup Suite)")
    ("RDUNINSTALL" "ROADPROUNINSTALL" "Remove from the Startup Suite")
    ("RDHELP"  "ROADHELP"        "This list")))
@@ -9139,6 +9143,66 @@
   (princ "\nRoad Pro settings restored to defaults (width 7.30 m, radius 10 m).")
   (princ))
 
+;;---------------------------------------------------------------------------
+;;  v3.6.1 : RoadPro Hub - update notice at start-up and RDHUB
+;;  RoadPro Hub writes %LOCALAPPDATA%\RoadPro Hub\update-available.txt
+;;  (line 1 = the new version) when GitHub Releases has a newer RoadPro.
+;;---------------------------------------------------------------------------
+(defun rp:hub-dir ()
+  (if (getenv "LOCALAPPDATA") (strcat (getenv "LOCALAPPDATA") "\\RoadPro Hub")))
+
+(defun rp:hub-exe ()
+  (if (getenv "LOCALAPPDATA")
+    (findfile (strcat (getenv "LOCALAPPDATA") "\\Programs\\RoadPro Hub\\RoadProHub.exe"))))
+
+;; "3.6.1" -> (3 6 1)
+(defun rp:ver-list (s / r p)
+  (setq s (vl-string-trim " \t\r\n" s))
+  (while (setq p (vl-string-search "." s))
+    (setq r (cons (atoi (substr s 1 p)) r)
+          s (substr s (+ p 2))))
+  (setq r (reverse (cons (atoi s) r)))
+  (while (< (length r) 3) (setq r (append r '(0))))
+  r)
+
+;; is version a newer than version b
+(defun rp:ver-newer (a b / la lb)
+  (setq la (rp:ver-list a) lb (rp:ver-list b))
+  (while (and la lb (= (car la) (car lb)))
+    (setq la (cdr la) lb (cdr lb)))
+  (if (and la lb) (> (car la) (car lb))))
+
+;; newer RoadPro waiting (from RoadPro Hub) -> "3.7" or nil
+(defun rp:update-waiting (/ d f h v)
+  (if (and (setq d (rp:hub-dir))
+           (setq f (findfile (strcat d "\\update-available.txt")))
+           (setq h (open f "r")))
+    (progn
+      (setq v (read-line h))
+      (close h)
+      (if (and v (/= (vl-string-trim " \t\r\n" v) "") (rp:ver-newer v *rp:ver*))
+        (vl-string-trim " \t\r\n" v)))))
+
+;; one notice per AutoCAD session
+(defun rp:update-notice (/ v)
+  (if (and (setq v (rp:update-waiting)) (/= (vl-bb-ref '*rp:updnote*) v))
+    (progn
+      (vl-bb-set '*rp:updnote* v)
+      (princ (strcat "\n** RoadPro " v " is available (you have " *rp:ver* ").  Type RDHUB to update. **"))))
+  (princ))
+
+(defun c:ROADPROHUB (/ exe)
+  (if (setq exe (rp:hub-exe))
+    (progn
+      (startapp (strcat "\"" exe "\""))
+      (princ "\n  RoadPro Hub opened : updates, repair, user guide."))
+    (progn
+      (princ "\n  RoadPro Hub is not installed on this computer.")
+      (princ "\n  Download RoadPro_Setup from https://github.com/Asjad-Mehmood/Road-pro/releases")
+      (vl-catch-all-apply 'startapp (list "explorer" "https://github.com/Asjad-Mehmood/Road-pro/releases"))))
+  (princ))
+(defun c:RDHUB () (c:ROADPROHUB))
+
 (setq *rp:busy* nil)
 (vl-catch-all-apply 'rp:live-init nil)
 (vl-catch-all-apply 'rp:menu nil)
@@ -9146,4 +9210,5 @@
 (princ (strcat "\nRoad Pro v" *rp:ver* " loaded  (AutoCAD / Civil 3D).  RDP = build road   |   RDJ = junction / roundabout   |   RDRB = roundabout   |   RDPV = pavement (asphalt / concrete)   |   RDC = corridor   |   RDR = report   |   RDX = cross sections   |   RDLIVE = live update "
                (if (rp:live-on) "ON" "OFF") "   |   RDHELP = all commands"))
 (princ "\nDeveloped by https://www.exceltokml.com/")
+(vl-catch-all-apply 'rp:update-notice nil)
 (princ)

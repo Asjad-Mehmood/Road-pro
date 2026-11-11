@@ -1,14 +1,25 @@
-ROADPRO v3.6  -  Road Builder for AutoCAD / Civil 3D            11-Nov-2026
+ROADPRO v3.6.1  -  Road Builder for AutoCAD / Civil 3D          11-Nov-2026
 Developed by https://www.exceltokml.com/
 =============================================================================
 
 INSTALL
-  Add-in (recommended) : unzip RoadPro_v3.6_AddIn.zip, close AutoCAD and
-  double-click Install_RoadPro.bat. It replaces v3.5 by itself.
-  APPLOAD method : load RoadPro.lsp ONE time - it installs itself.
-  Roads built with v3.5 keep working. Run RDB once on a road with
-  junctions to get the v3.6 clean tie-in.
+  Run RoadPro_Setup_v3.6.1.exe (from GitHub Releases). No administrator
+  rights needed. It installs RoadPro Hub and the AutoCAD plugin, and
+  replaces any older RoadPro by itself.
 
+WHAT IS NEW IN v3.6.1  -  AUTOMATIC UPDATES
+  - RoadPro Hub checks GitHub Releases for a new RoadPro: when you open
+    it, and once a day when Windows starts (you can switch this off).
+  - Update in one click: the setup is downloaded, checked (size and
+    SHA-256 security code) and installed; the AutoCAD plugin is updated
+    too. The previous version is kept and can be restored.
+  - "Skip this version" if you do not want a particular update.
+  - AutoCAD shows a notice at start-up when an update is waiting:
+      ** RoadPro 3.7 is available (you have 3.6.1).  Type RDHUB to update. **
+  - New command RDHUB (ROADPROHUB) opens RoadPro Hub: updates, repair,
+    user guide, shortcut keys.
+
+=============================================================================
 WHAT IS NEW IN v3.6  (fixes from the error report + new features)
   1. Clean tie-in at junctions (RDJ)
      - The side road now starts where the kerb returns end. Its own surface,
@@ -59,7 +70,3 @@ WHAT IS NEW IN v3.6  (fixes from the error report + new features)
 TESTED
   Full regression of v3.5 plus 34 new drawing checks on the cases of the
   error report - see RoadPro_v3.6_Test_Report.pdf.
-
-ON HOLD
-  Own setup program and automatic updates : waiting for the decision with
-  Mr. Muhammad Abdullah.

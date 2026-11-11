@@ -46,6 +46,29 @@
                     <TextBlock x:Name="BannerText" TextWrapping="Wrap" Foreground="{StaticResource Warn}" />
                 </Border>
 
+                <!-- updates card -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button x:Name="CheckButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Check now"
+                                    MinWidth="0" Padding="12,4" Margin="0" Click="OnCheckUpdates" VerticalAlignment="Top" />
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource CardTitle}" Text="Updates" />
+                                <TextBlock x:Name="UpdateText" Foreground="{StaticResource InkSoft}" TextWrapping="Wrap" Margin="0,8,0,0" Text="Checking for updates..." />
+                                <TextBlock x:Name="UpdateNotes" Foreground="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" Visibility="Collapsed" />
+                            </StackPanel>
+                        </DockPanel>
+                        <WrapPanel x:Name="UpdateActions" Margin="0,14,0,0" Visibility="Collapsed">
+                            <Button x:Name="UpdateNowButton" Style="{StaticResource PrimaryButton}" Content="Update now" Click="OnUpdateNow" />
+                            <Button x:Name="SkipButton" Style="{StaticResource SecondaryButton}" Content="Skip this version" Click="OnSkipUpdate" />
+                        </WrapPanel>
+                        <ProgressBar x:Name="UpdateProgress" Height="4" Maximum="1" Margin="0,14,0,0" Visibility="Collapsed"
+                                     Foreground="{StaticResource Amber}" Background="{StaticResource Line}" BorderThickness="0" />
+                        <CheckBox x:Name="AutoCheckBox" Content="Check for updates when Windows starts" Margin="0,14,0,0"
+                                  Foreground="{StaticResource InkSoft}" Checked="OnAutoCheckChanged" Unchecked="OnAutoCheckChanged" />
+                    </StackPanel>
+                </Border>
+
                 <!-- plugin card -->
                 <Border Style="{StaticResource CardBorder}">
                     <StackPanel>

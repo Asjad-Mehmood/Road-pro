@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,11 +19,25 @@ namespace RoadPro.Hub
         private BundleInfo _installed;
         private PluginState _state;
 
-        public MainWindow()
+        private readonly string _startBanner;
+        private UpdateManifest _update;
+        private bool _loadingAutoCheck;
+
+        public MainWindow() : this(null) { }
+
+        internal MainWindow(string startBanner)
         {
+            _startBanner = startBanner;
             InitializeComponent();
             HubVersionText.Text = "Version " + VersionText.Friendly(App.HubVersion);
-            Loaded += (s, e) => RefreshAll();
+            _loadingAutoCheck = true;
+            AutoCheckBox.IsChecked = StartupRegistration.IsEnabled;
+            _loadingAutoCheck = false;
+            Loaded += async (s, e) =>
+            {
+                RefreshAll();
+                await CheckUpdatesAsync(false);
+            };
             Activated += (s, e) => RefreshBanner();
         }
 
@@ -99,6 +114,7 @@ namespace RoadPro.Hub
         private void RefreshBanner()
         {
             var notes = new List<string>();
+            if (!string.IsNullOrEmpty(_startBanner)) notes.Add(_startBanner);
             if (IsAutoCadRunning())
                 notes.Add("AutoCAD is running. You can install now - the new RoadPro loads the next time AutoCAD starts.");
             var all = App.Paths.AllUsersBundle();
@@ -171,6 +187,85 @@ namespace RoadPro.Hub
         }
 
         private void OnRefresh(object sender, RoutedEventArgs e) => RefreshAll();
+
+        // ------------------------------------------------------------------ updates
+
+        private async void OnCheckUpdates(object sender, RoutedEventArgs e) => await CheckUpdatesAsync(true);
+
+        private async Task CheckUpdatesAsync(bool manual)
+        {
+            CheckButton.IsEnabled = false;
+            UpdateText.Text = "Checking for updates...";
+            var r = await Task.Run(() => App.Updates.Check(honourSkip: false));
+            CheckButton.IsEnabled = true;
+            _update = r.Status == UpdateStatus.Available ? r.Manifest : null;
+            UpdateNotes.Visibility = Visibility.Collapsed;
+            UpdateActions.Visibility = Visibility.Collapsed;
+            switch (r.Status)
+            {
+                case UpdateStatus.Available:
+                    UpdateText.Text = r.Message;
+                    UpdateText.Foreground = (Brush)FindResource("Warn");
+                    UpdateNotes.Text = r.Manifest.Notes ?? "";
+                    UpdateNotes.Visibility = string.IsNullOrWhiteSpace(UpdateNotes.Text) ? Visibility.Collapsed : Visibility.Visible;
+                    UpdateNowButton.Content = "Update to " + r.Manifest.FriendlyVersion;
+                    UpdateActions.Visibility = Visibility.Visible;
+                    SkipButton.Visibility = App.Updates.LoadState().SkippedVersion == r.Manifest.Version.ToString() ? Visibility.Collapsed : Visibility.Visible;
+                    break;
+                case UpdateStatus.Failed:
+                    UpdateText.Text = manual ? r.Message : "Could not check for updates right now (offline?). Use Check now to try again.";
+                    UpdateText.Foreground = (Brush)FindResource(manual ? "Bad" : "Muted");
+                    break;
+                default:
+                    UpdateText.Text = r.Message + "  Checked " + DateTime.Now.ToString("d MMM yyyy, HH:mm") + ".";
+                    UpdateText.Foreground = (Brush)FindResource("Good");
+                    break;
+            }
+        }
+
+        private async void OnUpdateNow(object sender, RoutedEventArgs e)
+        {
+            if (_update == null) return;
+            if (IsAutoCadRunning())
+            {
+                var ask = MessageBox.Show(this, "AutoCAD is open. Save your drawings first: the new RoadPro loads the next time AutoCAD starts.\n\nUpdate now?",
+                                          "RoadPro Hub", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (ask != MessageBoxResult.Yes) return;
+            }
+            UpdateActions.IsEnabled = false;
+            CheckButton.IsEnabled = false;
+            UpdateProgress.Value = 0;
+            UpdateProgress.Visibility = Visibility.Visible;
+            UpdateText.Text = $"Downloading RoadPro {_update.FriendlyVersion}...";
+            UpdateText.Foreground = (Brush)FindResource("InkSoft");
+            var progress = new Progress<double>(p => UpdateProgress.Value = p);
+            var r = await Updater.DownloadAndRunAsync(App.Updates, _update, true, progress, CancellationToken.None);
+            if (r.Success)
+            {
+                UpdateText.Text = r.Message + " RoadPro Hub opens again when the update is finished.";
+                Application.Current.Shutdown(0);
+                return;
+            }
+            UpdateProgress.Visibility = Visibility.Collapsed;
+            UpdateActions.IsEnabled = true;
+            CheckButton.IsEnabled = true;
+            UpdateText.Text = r.Message;
+            UpdateText.Foreground = (Brush)FindResource("Bad");
+        }
+
+        private void OnSkipUpdate(object sender, RoutedEventArgs e)
+        {
+            if (_update == null) return;
+            App.Updates.Skip(_update);
+            SkipButton.Visibility = Visibility.Collapsed;
+            UpdateText.Text = $"RoadPro {_update.FriendlyVersion} will not be offered at Windows start. You can still install it here.";
+        }
+
+        private void OnAutoCheckChanged(object sender, RoutedEventArgs e)
+        {
+            if (_loadingAutoCheck) return;
+            StartupRegistration.Set(AutoCheckBox.IsChecked == true);
+        }
 
         private void OnOpenDoc(object sender, RoutedEventArgs e)
         {

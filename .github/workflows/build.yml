@@ -78,43 +78,114 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
           Get-ChildItem installer/Output
 
-      - name: Test the setup (silent install, check, silent uninstall)
+      - name: Build a test "next version" setup (for the update test)
+        id: next
         shell: pwsh
         run: |
-          $setup = Get-ChildItem installer/Output/*.exe | Select-Object -First 1
-          $p = Start-Process $setup.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/LOG=setup.log' -Wait -PassThru
-          if ($p.ExitCode -ne 0) { Get-Content setup.log; throw "setup failed ($($p.ExitCode))" }
+          $v = '${{ steps.ver.outputs.version }}'; $p = $v.Split('.')
+          $n = "$($p[0]).$($p[1]).$([int]$p[2] + 1)"
+          "version=$n" >> $env:GITHUB_OUTPUT
+          dotnet publish hub/src/RoadPro.Hub/RoadPro.Hub.csproj -c Release -o build/hub -p:Version=$n
+          if ($LASTEXITCODE -ne 0) { throw "publish failed" }
+          $pc = 'plugin/RoadPro.bundle/PackageContents.xml'
+          (Get-Content $pc -Raw) -replace 'AppVersion="[^"]+"', "AppVersion=""$n""" | Set-Content $pc -NoNewline
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$n" "/O$PWD\test-next" installer/RoadProHub.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+          git checkout -- plugin
+          Get-ChildItem test-next
+
+      - name: Test setup, automatic update and uninstall
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $v = '${{ steps.ver.outputs.version }}'; $n = '${{ steps.next.outputs.version }}'
           $app = Join-Path $env:LOCALAPPDATA 'Programs\RoadPro Hub'
+          $hubExe = "$app\RoadProHub.exe"
           $target = Join-Path $env:APPDATA 'Autodesk\ApplicationPlugins\RoadPro.bundle'
-          foreach ($f in "$app\RoadProHub.exe", "$app\payload\RoadPro.bundle\PackageContents.xml", "$target\Contents\RoadPro.lsp", "$target\Contents\Docs") {
-            if (-not (Test-Path $f)) { Get-Content setup.log; throw "missing after setup: $f" }
-          }
-          # screenshot of the Hub window for the build record
-          $hub = Start-Process "$app\RoadProHub.exe" -PassThru
-          Start-Sleep -Seconds 8
-          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $data = Join-Path $env:LOCALAPPDATA 'RoadPro Hub'
+          $runKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
+          New-Item -ItemType Directory -Force screenshots | Out-Null
+          function Fail($m) { Get-Content "$data\logs\RoadProHub.log" -ErrorAction SilentlyContinue | Select-Object -Last 40; throw $m }
+          function PluginVersion { ([xml](Get-Content "$target\PackageContents.xml")).ApplicationPackage.AppVersion }
+          function HubVersion { (Get-Item $hubExe).VersionInfo.FileVersion }
+          Add-Type -AssemblyName System.Drawing
           Add-Type @"
           using System; using System.Runtime.InteropServices;
           public static class Win { [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
             [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
             public struct RECT { public int L, T, R, B; } }
           "@
-          $hub.Refresh(); $h = $hub.MainWindowHandle
-          [Win]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Seconds 1
-          $r = New-Object Win+RECT; [Win]::GetWindowRect($h, [ref]$r) | Out-Null
-          $w = [Math]::Max(200, $r.R - $r.L); $hh = [Math]::Max(200, $r.B - $r.T)
-          $bmp = New-Object System.Drawing.Bitmap $w, $hh
-          [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($r.L, $r.T, 0, 0, $bmp.Size)
-          New-Item -ItemType Directory -Force screenshots | Out-Null
-          $bmp.Save("screenshots/RoadProHub.png", [System.Drawing.Imaging.ImageFormat]::Png)
-          Stop-Process -Id $hub.Id -Force
+          function Shot($proc, $file) {
+            $proc.Refresh(); $h = $proc.MainWindowHandle
+            if ($h -eq [IntPtr]::Zero) { Write-Host "no window for $file"; return }
+            [Win]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Seconds 1
+            $r = New-Object Win+RECT; [Win]::GetWindowRect($h, [ref]$r) | Out-Null
+            $bmp = New-Object System.Drawing.Bitmap ([Math]::Max(100, $r.R - $r.L)), ([Math]::Max(100, $r.B - $r.T))
+            [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($r.L, $r.T, 0, 0, $bmp.Size)
+            $bmp.Save("screenshots/$file", [System.Drawing.Imaging.ImageFormat]::Png)
+          }
+          function Manifest($ver, $setup, $hash, $file) {
+            $m = [ordered]@{ version = $ver; released = (Get-Date -Format 'yyyy-MM-dd'); setupUrl = ([Uri](Resolve-Path $setup).Path).AbsoluteUri
+                             sha256 = $hash; size = (Get-Item $setup).Length; notes = "Test release $ver" }
+            $m | ConvertTo-Json | Set-Content $file -Encoding utf8
+            return ([Uri](Resolve-Path $file).Path).AbsoluteUri
+          }
+
+          # 1. install version V silently (default tasks: plugin + start-up check)
+          $setupV = Get-ChildItem installer/Output/*.exe | Select-Object -First 1
+          $p = Start-Process $setupV.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/LOG=setup.log' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content setup.log; throw "setup failed ($($p.ExitCode))" }
+          foreach ($f in $hubExe, "$app\payload\RoadPro.bundle\PackageContents.xml", "$target\Contents\RoadPro.lsp", "$target\Contents\Docs") {
+            if (-not (Test-Path $f)) { Get-Content setup.log; throw "missing after setup: $f" }
+          }
+          if ((PluginVersion) -ne $v) { Fail "plugin version $(PluginVersion), expected $v" }
+          $run = (Get-ItemProperty $runKey -Name 'RoadPro Hub' -ErrorAction SilentlyContinue).'RoadPro Hub'
+          if ($run -notlike '*/checkupdates*') { Fail "start-up check not registered" }
+          Write-Host "Installed $v; start-up check: $run"
+
+          # 2. screenshot: main window with an update waiting
+          $nextSetup = Get-ChildItem test-next/*.exe | Select-Object -First 1
+          $hash = (Get-FileHash $nextSetup.FullName -Algorithm SHA256).Hash.ToLower()
+          $manifest = Manifest $n $nextSetup.FullName $hash "$PWD\test-next\update.json"
+          $env:ROADPRO_UPDATE_MANIFEST = $manifest
+          $hub = Start-Process $hubExe -PassThru; Start-Sleep -Seconds 10
+          Shot $hub 'RoadProHub_update_available.png'; Stop-Process -Id $hub.Id -Force
+          # the Windows start-up prompt (first check of the day)
+          Remove-Item "$data\update-state.json" -ErrorAction SilentlyContinue
+          $hub = Start-Process $hubExe -ArgumentList '/checkupdates' -PassThru; Start-Sleep -Seconds 30
+          Shot $hub 'RoadProHub_startup_prompt.png'
+          if (-not $hub.HasExited) { Stop-Process -Id $hub.Id -Force } else { Fail "start-up check did not show the prompt" }
+          $notice = Get-Content "$data\update-available.txt" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($notice -ne ($n -replace '\.0$', '')) { Fail "update-available.txt says '$notice', expected $n" }
+          Remove-Item Env:\ROADPRO_UPDATE_MANIFEST
+
+          # 3. a tampered update must be refused
+          $bad = Manifest $n $nextSetup.FullName ('0' * 64) "$PWD\test-next\bad.json"
+          $p = Start-Process $hubExe -ArgumentList '/autoupdate', "/manifest=$bad" -Wait -PassThru
+          if ($p.ExitCode -eq 0) { Fail "tampered update was accepted" }
+          if ((HubVersion) -notlike "$v*") { Fail "version changed after a refused update" }
+          Write-Host "Tampered update refused (exit $($p.ExitCode))"
+
+          # 4. real update V -> N through the Hub
+          $p = Start-Process $hubExe -ArgumentList '/autoupdate', "/manifest=$manifest" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Fail "autoupdate failed ($($p.ExitCode))" }
+          for ($i = 0; $i -lt 180; $i++) {
+            if ((HubVersion) -like "$n*" -and -not (Get-Process -Name 'RoadPro_Setup_*' -ErrorAction SilentlyContinue)) { break }
+            Start-Sleep -Seconds 1
+          }
+          if ((HubVersion) -notlike "$n*") { Get-Content "$data\updates\setup.log" -ErrorAction SilentlyContinue | Select-Object -Last 30; Fail "Hub is $(HubVersion) after the update, expected $n" }
+          if ((PluginVersion) -ne $n) { Fail "plugin is $(PluginVersion) after the update, expected $n" }
+          if (-not (Get-ChildItem "$data\backup" -Directory | Where-Object Name -like "RoadPro.bundle_$v*")) { Fail "no backup of $v kept" }
+          Write-Host "Updated $v -> $n (Hub and plugin), backup of $v kept"
+
+          # 5. uninstall: Hub, plugin and start-up check removed
           $un = Get-ChildItem "$app\unins*.exe" | Select-Object -First 1
-          $p = Start-Process $un.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
-          # the uninstaller re-launches itself from %TEMP%; wait for it to finish
-          for ($i = 0; $i -lt 60 -and ((Test-Path $target) -or (Test-Path "$app\RoadProHub.exe")); $i++) { Start-Sleep -Seconds 1 }
-          if (Test-Path $target) { throw "plugin still installed after uninstall" }
-          if (Test-Path "$app\RoadProHub.exe") { throw "Hub still installed after uninstall" }
-          Write-Host "Setup install / uninstall OK"
+          Start-Process $un.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait | Out-Null
+          for ($i = 0; $i -lt 60 -and ((Test-Path $target) -or (Test-Path $hubExe)); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path $target) { Fail "plugin still installed after uninstall" }
+          if (Test-Path $hubExe) { Fail "Hub still installed after uninstall" }
+          if ((Get-ItemProperty $runKey -Name 'RoadPro Hub' -ErrorAction SilentlyContinue)) { Fail "start-up check still registered" }
+          Write-Host "Setup, update and uninstall OK"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -128,10 +199,31 @@ jobs:
           path: screenshots/*.png
           if-no-files-found: warn
 
+      - name: Write update.json (tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $v = '${{ steps.ver.outputs.version }}'
+          $setup = Get-Item "installer/Output/RoadPro_Setup_v$v.exe"
+          $notes = (Get-Content "docs/RoadPro_v${{ steps.ver.outputs.short }}_WhatsNew.txt" -Raw)
+          $m = [ordered]@{
+            version   = $v
+            released  = (Get-Date -Format 'yyyy-MM-dd')
+            setupUrl  = "https://github.com/${{ github.repository }}/releases/download/v$v/$($setup.Name)"
+            sha256    = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower()
+            size      = $setup.Length
+            notes     = "See what is new in RoadPro $v."
+            notesUrl  = "https://github.com/${{ github.repository }}/releases/tag/v$v"
+          }
+          $m | ConvertTo-Json | Set-Content installer/Output/update.json -Encoding utf8
+          Get-Content installer/Output/update.json
+
       - name: Publish release (tags v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: RoadPro ${{ steps.ver.outputs.version }}
           body_path: docs/RoadPro_v${{ steps.ver.outputs.short }}_WhatsNew.txt
-          files: installer/Output/*.exe
+          files: |
+            installer/Output/*.exe
+            installer/Output/update.json

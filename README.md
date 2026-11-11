@@ -23,6 +23,9 @@ A small Windows app that looks after RoadPro:
 - keeps the previous version as a backup, so you can go back
 - lists the AutoCAD / Civil 3D versions on the computer
 - opens the user guide, shortcut keys, what's new and the test report
+- **automatic updates**: checks this repository's Releases when it opens and once a day at Windows start,
+  downloads the new setup, verifies its size and SHA-256 and installs it (Hub and plugin); "Skip this version" is possible
+- AutoCAD shows a notice at start-up when an update is waiting; the `RDHUB` command opens the Hub
 
 After installing, start AutoCAD: RoadPro loads in every drawing. Type `RDP` to build a road and `RDHELP` for all commands.
 
@@ -44,11 +47,12 @@ Every push to `main` builds the setup on GitHub Actions (Windows). The run:
 1. checks that `version.txt`, `PackageContents.xml` and `RoadPro.lsp` show the same version
 2. runs the Hub unit tests
 3. builds RoadPro Hub and installs / uninstalls the plugin from the command line
-4. builds `RoadPro_Setup_vX.Y.Z.exe` with Inno Setup, then installs and uninstalls it silently
-5. attaches the setup to the run (Actions -> the run -> Artifacts)
+4. builds `RoadPro_Setup_vX.Y.Z.exe` with Inno Setup and a test "next version" setup
+5. installs the setup silently, updates it to the next version through the Hub, checks a tampered update is refused, uninstalls
+6. attaches the setup and screenshots to the run (Actions -> the run -> Artifacts)
 
 **Publishing a release:** update `version.txt`, `PackageContents.xml` and `docs/`, then push a tag such as `v3.6.0`.
-The setup is attached to a new GitHub Release automatically.
+The setup and `update.json` are attached to a new GitHub Release automatically, and every installed Hub offers the update.
 
 Local build on Windows: Visual Studio 2022 (".NET desktop development"), open `hub/RoadProHub.sln`; then
 `ISCC.exe /DAppVersion=3.6.0 installer\RoadProHub.iss` with Inno Setup 6.
@@ -58,12 +62,22 @@ Command line (used by the setup):
 ```
 RoadProHub.exe /installplugin [/quiet]     install / update the plugin
 RoadProHub.exe /uninstallplugin [/quiet]   remove the plugin
+RoadProHub.exe /checkupdates               Windows start-up check (prompt only when an update waits)
+RoadProHub.exe /autoupdate [/manifest=URL] check, download, verify and install without a window
 ```
+
+### How updates work
+
+Each tagged release carries `RoadPro_Setup_vX.Y.Z.exe` and `update.json` (version, download address, size, SHA-256).
+The Hub reads `releases/latest/download/update.json`, compares versions, downloads the setup only from github.com
+(or exceltokml.com), checks size and SHA-256, then runs it silently; the setup closes and reopens the Hub.
+The previous plugin is kept as a backup. Every build tests a real update from this version to the next one,
+and that a tampered download is refused.
 
 ## Roadmap
 
 - [x] **Phase 1:** RoadPro Hub app and setup program
-- [ ] **Phase 2:** automatic updates (Hub and plugin)
+- [x] **Phase 2:** automatic updates (Hub and plugin)
 - [ ] **Phase 3:** code protection and licence (optional)
 - [ ] **Phase 4:** beta test and launch
 

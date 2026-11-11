@@ -52,6 +52,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "installplugin"; Description: "Install the RoadPro plugin in AutoCAD / Civil 3D now (recommended)"; GroupDescription: "RoadPro plugin:"
+Name: "autoupdate"; Description: "Check for RoadPro updates when Windows starts (once a day)"; GroupDescription: "Updates:"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [InstallDelete]
@@ -65,6 +66,11 @@ Source: "..\plugin\RoadPro.bundle\*"; DestDir: "{app}\payload\RoadPro.bundle"; F
 Source: "..\docs\*"; DestDir: "{app}\payload\RoadPro.bundle\Contents\Docs"; Flags: ignoreversion
 Source: "..\docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion
 
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "RoadPro Hub"; ValueData: """{app}\{#AppExe}"" /checkupdates"; Flags: uninsdeletevalue; Tasks: autoupdate
+; task unticked on an update: remove the start-up check
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueName: "RoadPro Hub"; ValueType: none; Flags: deletevalue; Tasks: not autoupdate
+
 [Icons]
 Name: "{autoprograms}\RoadPro Hub"; Filename: "{app}\{#AppExe}"
 Name: "{autodesktop}\RoadPro Hub"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
@@ -72,6 +78,8 @@ Name: "{autodesktop}\RoadPro Hub"; Filename: "{app}\{#AppExe}"; Tasks: desktopic
 [Run]
 Filename: "{app}\{#AppExe}"; Parameters: "/installplugin /quiet"; StatusMsg: "Installing the RoadPro plugin for AutoCAD..."; Flags: runhidden waituntilterminated; Tasks: installplugin
 Filename: "{app}\{#AppExe}"; Description: "Open RoadPro Hub"; Flags: nowait postinstall skipifsilent
+; update started from RoadPro Hub (/RELAUNCH=1): open the Hub again when done
+Filename: "{app}\{#AppExe}"; Parameters: "/updated"; Flags: nowait; Check: RelaunchHub
 
 [UninstallRun]
 Filename: "{app}\{#AppExe}"; Parameters: "/uninstallplugin /quiet"; RunOnceId: "RemoveRoadProPlugin"; Flags: runhidden waituntilterminated
@@ -83,6 +91,11 @@ var
 begin
   Result := RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', Release)
             and (Release >= 528040);
+end;
+
+function RelaunchHub: Boolean;
+begin
+  Result := ExpandConstant('{param:RELAUNCH|0}') = '1';
 end;
 
 function InitializeSetup: Boolean;
