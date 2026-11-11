@@ -89,6 +89,25 @@ jobs:
           foreach ($f in "$app\RoadProHub.exe", "$app\payload\RoadPro.bundle\PackageContents.xml", "$target\Contents\RoadPro.lsp", "$target\Contents\Docs") {
             if (-not (Test-Path $f)) { Get-Content setup.log; throw "missing after setup: $f" }
           }
+          # screenshot of the Hub window for the build record
+          $hub = Start-Process "$app\RoadProHub.exe" -PassThru
+          Start-Sleep -Seconds 8
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          Add-Type @"
+          using System; using System.Runtime.InteropServices;
+          public static class Win { [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
+            [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+            public struct RECT { public int L, T, R, B; } }
+          "@
+          $hub.Refresh(); $h = $hub.MainWindowHandle
+          [Win]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Seconds 1
+          $r = New-Object Win+RECT; [Win]::GetWindowRect($h, [ref]$r) | Out-Null
+          $w = [Math]::Max(200, $r.R - $r.L); $hh = [Math]::Max(200, $r.B - $r.T)
+          $bmp = New-Object System.Drawing.Bitmap $w, $hh
+          [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($r.L, $r.T, 0, 0, $bmp.Size)
+          New-Item -ItemType Directory -Force screenshots | Out-Null
+          $bmp.Save("screenshots/RoadProHub.png", [System.Drawing.Imaging.ImageFormat]::Png)
+          Stop-Process -Id $hub.Id -Force
           $un = Get-ChildItem "$app\unins*.exe" | Select-Object -First 1
           $p = Start-Process $un.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
           # the uninstaller re-launches itself from %TEMP%; wait for it to finish
@@ -102,6 +121,12 @@ jobs:
           name: RoadPro_Setup_v${{ steps.ver.outputs.version }}
           path: installer/Output/*.exe
           if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/*.png
+          if-no-files-found: warn
 
       - name: Publish release (tags v*)
         if: startsWith(github.ref, 'refs/tags/v')
