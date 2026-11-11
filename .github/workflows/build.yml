@@ -6,6 +6,14 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+  # publishing a release on github.com (tag vX.Y.Z) builds and attaches the setup
+  release:
+    types: [published]
+
+# one build per branch / tag at a time (a release can start two: tag push + release)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
