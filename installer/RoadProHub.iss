@@ -9,7 +9,6 @@
 #define AppExe "RoadProHub.exe"
 #define Publisher "exceltokml.com"
 #define PublisherUrl "https://www.exceltokml.com/"
-#define RepoUrl "https://github.com/Asjad-Mehmood/Road-pro"
 
 [Setup]
 ; never change AppId - Windows uses it to find and upgrade the installed Hub
@@ -19,8 +18,8 @@ AppVersion={#AppVersion}
 AppVerName=RoadPro {#AppVersion}
 AppPublisher={#Publisher}
 AppPublisherURL={#PublisherUrl}
-AppSupportURL={#RepoUrl}/issues
-AppUpdatesURL={#RepoUrl}/releases
+AppSupportURL={#PublisherUrl}contact
+AppUpdatesURL={#PublisherUrl}roadpro
 AppCopyright=Copyright (C) 2026 {#Publisher}
 VersionInfoVersion={#AppVersion}
 VersionInfoDescription=RoadPro for AutoCAD and Civil 3D - setup

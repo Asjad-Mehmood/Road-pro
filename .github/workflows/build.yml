@@ -286,7 +286,7 @@ jobs:
             sha256    = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower()
             size      = $setup.Length
             notes     = "See what is new in RoadPro $v."
-            notesUrl  = "https://github.com/${{ github.repository }}/releases/tag/v$v"
+            notesUrl  = "https://www.exceltokml.com/roadpro#new"
           }
           $m | ConvertTo-Json | Set-Content installer/Output/update.json -Encoding utf8
           Get-Content installer/Output/update.json
