@@ -34,6 +34,8 @@
   <ItemGroup>
     <Resource Include="Assets\RoadPro_256.png" />
     <Resource Include="Assets\RoadPro.ico" />
+    <Resource Include="Assets\Fonts\Inter_*.ttf" />
+    <None Include="Assets\Fonts\OFL.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

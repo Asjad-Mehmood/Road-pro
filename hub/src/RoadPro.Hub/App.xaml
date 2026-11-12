@@ -4,62 +4,101 @@
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 
-        <!-- brand colours -->
-        <SolidColorBrush x:Key="Ink" Color="#1E2228" />
-        <SolidColorBrush x:Key="InkSoft" Color="#4A515B" />
-        <SolidColorBrush x:Key="Muted" Color="#7A828C" />
-        <SolidColorBrush x:Key="Paper" Color="#F4F1EA" />
+        <!--
+          The look of the Survey Toolkit (Survey-Toolkit lib/src/ui/theme.dart): the logo's navy and
+          survey gold on a cool grey page, white cards with a hairline border and round corners,
+          Inter for text (inside the program, so it looks the same on every PC).
+        -->
+        <FontFamily x:Key="TextFont">pack://application:,,,/Assets/Fonts/#Inter, Segoe UI</FontFamily>
+
+        <Color x:Key="NavyColor">#0A1A36</Color>
+        <Color x:Key="NavyLightColor">#17386B</Color>
+        <SolidColorBrush x:Key="Navy" Color="#17386B" />
+        <SolidColorBrush x:Key="NavyDeep" Color="#0A1A36" />
+        <SolidColorBrush x:Key="Tonal" Color="#DCE4F6" />
+        <SolidColorBrush x:Key="TonalHover" Color="#CFD9F1" />
+        <LinearGradientBrush x:Key="Hero" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="{StaticResource NavyColor}" Offset="0" />
+            <GradientStop Color="{StaticResource NavyLightColor}" Offset="1" />
+        </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="Ink" Color="#0E1B33" />
+        <SolidColorBrush x:Key="InkSoft" Color="#2E3C57" />
+        <SolidColorBrush x:Key="Muted" Color="#5A6A85" />
+        <SolidColorBrush x:Key="Paper" Color="#F3F5F9" />
         <SolidColorBrush x:Key="Card" Color="#FFFFFF" />
-        <SolidColorBrush x:Key="Line" Color="#E2DDD2" />
-        <SolidColorBrush x:Key="Amber" Color="#F2A900" />
-        <SolidColorBrush x:Key="AmberDark" Color="#C98B00" />
-        <SolidColorBrush x:Key="Good" Color="#2E9E5B" />
-        <SolidColorBrush x:Key="GoodSoft" Color="#E3F4EA" />
-        <SolidColorBrush x:Key="Warn" Color="#9A6B00" />
-        <SolidColorBrush x:Key="WarnSoft" Color="#FFF1CC" />
-        <SolidColorBrush x:Key="Bad" Color="#D7262E" />
-        <SolidColorBrush x:Key="BadSoft" Color="#FBE3E4" />
+        <SolidColorBrush x:Key="CardSoft" Color="#F6F8FB" />
+        <SolidColorBrush x:Key="Line" Color="#E1E6EF" />
+        <SolidColorBrush x:Key="Amber" Color="#E2AE34" />
+        <SolidColorBrush x:Key="AmberDark" Color="#C8961F" />
+        <SolidColorBrush x:Key="Gold" Color="#E9B949" />
+
+        <!-- text in a colour, and the soft tint behind it -->
+        <SolidColorBrush x:Key="Good" Color="#1C7C4A" />
+        <SolidColorBrush x:Key="GoodSoft" Color="#E4F3EA" />
+        <SolidColorBrush x:Key="Warn" Color="#7A5608" />
+        <SolidColorBrush x:Key="WarnSoft" Color="#FBF2DD" />
+        <SolidColorBrush x:Key="WarnLine" Color="#EDCF86" />
+        <SolidColorBrush x:Key="Bad" Color="#B4442F" />
+        <SolidColorBrush x:Key="BadSoft" Color="#FBE9E5" />
+
+        <!-- the status tags ("UP TO DATE"): a solid fill and the text on it -->
+        <SolidColorBrush x:Key="GoodFill" Color="#1C7C4A" />
+        <SolidColorBrush x:Key="GoodOnFill" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="WarnFill" Color="#E2AE34" />
+        <SolidColorBrush x:Key="WarnOnFill" Color="#1B1405" />
+        <SolidColorBrush x:Key="BadFill" Color="#B4442F" />
+        <SolidColorBrush x:Key="BadOnFill" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="NoneFill" Color="#F6F8FB" />
+        <SolidColorBrush x:Key="NoneOnFill" Color="#5A6A85" />
 
         <Style x:Key="CardBorder" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource Card}" />
             <Setter Property="BorderBrush" Value="{StaticResource Line}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="22,18" />
-            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="22,20" />
+            <Setter Property="Margin" Value="0,0,0,14" />
         </Style>
 
+        <!-- a card's title: in capitals (written so in the text), as the Toolkit's section titles -->
         <Style x:Key="CardTitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Foreground" Value="{StaticResource Ink}" />
         </Style>
 
         <Style x:Key="BaseButton" TargetType="Button">
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Padding" Value="18,8" />
+            <Setter Property="Padding" Value="18,9" />
             <Setter Property="Margin" Value="0,0,10,0" />
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="13.5" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="MinWidth" Value="96" />
+            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.88" />
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.75" />
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.78" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Amber}" />
+                                <Setter TargetName="Bd" Property="BorderThickness" Value="2" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.42" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -67,13 +106,19 @@
             </Setter>
         </Style>
 
+        <!-- the main action: filled navy, as the Toolkit's Open -->
         <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
-            <Setter Property="Background" Value="{StaticResource Amber}" />
-            <Setter Property="BorderBrush" Value="{StaticResource AmberDark}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+            <Setter Property="Background" Value="{StaticResource Navy}" />
+            <Setter Property="Foreground" Value="White" />
         </Style>
 
+        <!-- a second action: light navy, as the Toolkit's Install and Update -->
+        <Style x:Key="TonalButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+            <Setter Property="Background" Value="{StaticResource Tonal}" />
+            <Setter Property="Foreground" Value="{StaticResource Navy}" />
+        </Style>
+
+        <!-- other actions: outlined, as the Toolkit's Web app -->
         <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
             <Setter Property="Background" Value="{StaticResource Card}" />
             <Setter Property="BorderBrush" Value="{StaticResource Line}" />
@@ -83,8 +128,15 @@
 
         <Style x:Key="DocButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Padding" Value="14,11" />
             <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Background" Value="{StaticResource CardSoft}" />
+        </Style>
+
+        <Style TargetType="ProgressBar">
+            <Setter Property="Foreground" Value="{StaticResource Navy}" />
+            <Setter Property="Background" Value="{StaticResource Line}" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
 
     </Application.Resources>
