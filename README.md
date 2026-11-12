@@ -38,20 +38,20 @@ After installing, start AutoCAD: RoadPro loads in every drawing. Type `RDP` to b
 | `installer/` | Inno Setup script for `RoadPro_Setup.exe`, wizard art, licence terms |
 | `docs/` | user guide, shortcut keys, what's new, test report |
 | `.github/workflows` | builds and tests everything on Windows for every push |
-| `version.txt` | the release version of the setup and RoadPro Hub (e.g. 1.0.0); the AutoCAD plugin keeps its own version in `PackageContents.xml` and `RoadPro.lsp` (e.g. 3.6.1) |
+| `version.txt` | the last released version of the setup and RoadPro Hub (e.g. 3.6.2), used by builds that are not a release (a release takes its version from its tag); the AutoCAD plugin keeps its own version in `PackageContents.xml` and `RoadPro.lsp` (e.g. 3.6.1) |
 
 ## Build
 
 Every push to `main` builds the setup on GitHub Actions (Windows). The run:
 
-1. checks the versions: `version.txt` is a valid release number, and `PackageContents.xml` and `RoadPro.lsp` show the same plugin version
+1. checks the versions: the release number (the tag, else `version.txt`) is valid, and `PackageContents.xml` and `RoadPro.lsp` show the same plugin version
 2. runs the Hub unit tests
 3. builds RoadPro Hub and installs / uninstalls the plugin from the command line
 4. builds `RoadPro_Setup_vX.Y.Z.exe` with Inno Setup and a test "next version" setup
 5. installs the setup silently, updates it to the next version through the Hub, checks a tampered update is refused, uninstalls
 6. attaches the setup and screenshots to the run (Actions -> the run -> Artifacts)
 
-**Publishing a release:** raise `version.txt` (and the plugin version if the plugin changed), update `docs/RoadPro_WhatsNew.txt`, then on github.com: *Releases → Draft a new release → tag* `v1.0.1` *→ Publish* (or push the tag).
+**Publishing a release:** on github.com: *Releases → Draft a new release → tag* `v3.6.3` *→ Publish*. The tag is the version: nothing has to be edited first. Optional: a few lines for the new version in `docs/RoadPro_WhatsNew.txt` (the release notes are made from it), and the plugin version if the plugin changed.
 The setup and `update.json` are attached to a new GitHub Release automatically, and every installed Hub offers the update.
 
 Local build on Windows: Visual Studio 2022 (".NET desktop development"), open `hub/RoadProHub.sln`; then
