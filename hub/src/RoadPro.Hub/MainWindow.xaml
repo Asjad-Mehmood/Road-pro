@@ -94,7 +94,7 @@
                                 <DockPanel>
                                     <Border DockPanel.Dock="Left" Width="46" Height="46" CornerRadius="12" Background="{StaticResource CardSoft}"
                                             BorderBrush="{StaticResource Line}" BorderThickness="1" Margin="0,0,14,0">
-                                        <TextBlock Style="{StaticResource Glyph}" Text="&#xE8B0;" FontSize="21" HorizontalAlignment="Center" Foreground="{StaticResource Ink}" />
+                                        <Image Source="Assets/RoadPro_256.png" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality" />
                                     </Border>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="RoadPro" FontSize="17" FontWeight="SemiBold" />
