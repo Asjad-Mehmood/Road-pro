@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="RoadPro update" Width="440" SizeToContent="Height" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Topmost="True" ShowInTaskbar="True"
-        Background="{StaticResource Card}" Icon="Assets/RoadPro.ico" FontFamily="Segoe UI" FontSize="13"
+        Background="{StaticResource Card}" Icon="Assets/RoadPro.ico" FontFamily="{StaticResource TextFont}" Foreground="{StaticResource Ink}" FontSize="13"
         TextOptions.TextFormattingMode="Display" UseLayoutRounding="True">
-    <Border BorderBrush="{StaticResource Amber}" BorderThickness="0,4,0,0">
+    <Border BorderBrush="{StaticResource Navy}" BorderThickness="0,4,0,0">
         <Grid Margin="20,16,20,18">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />

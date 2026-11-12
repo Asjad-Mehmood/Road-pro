@@ -18,6 +18,7 @@ namespace RoadPro.Hub
         private BundleInfo _available;
         private BundleInfo _installed;
         private PluginState _state;
+        private bool _damaged;
 
         private readonly string _startBanner;
         private UpdateManifest _update;
@@ -29,7 +30,7 @@ namespace RoadPro.Hub
         {
             _startBanner = startBanner;
             InitializeComponent();
-            HubVersionText.Text = "Version " + VersionText.Friendly(App.HubVersion);
+            HubVersionText.Text = "VERSION " + VersionText.Friendly(App.HubVersion);
             _loadingAutoCheck = true;
             AutoCheckBox.IsChecked = StartupRegistration.IsEnabled;
             _loadingAutoCheck = false;
@@ -58,6 +59,7 @@ namespace RoadPro.Hub
             _installed = m.GetInstalled();
             _state = PluginStates.Compare(_installed, _available);
             bool damaged = m.IsDamaged;
+            _damaged = damaged;
 
             InstalledText.Text = _installed != null
                 ? "Installed: plugin v" + _installed.FriendlyVersion
@@ -70,7 +72,7 @@ namespace RoadPro.Hub
             switch (_state)
             {
                 case PluginState.NotInstalled:
-                    SetPill(damaged ? "Damaged" : "Not installed", damaged ? "Bad" : "Warn");
+                    SetPill(damaged ? "Damaged" : "Not installed", damaged ? "Bad" : "None");
                     InstallButton.Content = damaged ? "Repair" : "Install";
                     break;
                 case PluginState.Older:
@@ -93,6 +95,45 @@ namespace RoadPro.Hub
             RepairButton.IsEnabled = _available != null;
             UninstallButton.IsEnabled = Directory.Exists(m.TargetPath);
             RestoreButton.Visibility = m.ListBackups().Any(b => BundleInfo.TryRead(b) != null) ? Visibility.Visible : Visibility.Collapsed;
+            RefreshHero();
+        }
+
+        /// <summary>The navy banner at the top: where RoadPro stands, in one line (as the Survey Toolkit's).</summary>
+        private void RefreshHero()
+        {
+            string plugin = _installed != null ? "Plugin v" + _installed.FriendlyVersion : null;
+            string hub = "RoadPro Hub " + VersionText.Friendly(App.HubVersion);
+            const string Done = "\uE930", Get = "\uE896", Fix = "\uE7BA";
+            if (_update != null)
+            {
+                SetHero(Get, "RoadPro " + _update.FriendlyVersion + " is available",
+                        "Press Update in the Updates card." + (plugin != null ? " You have " + plugin.ToLowerInvariant() + "." : ""));
+                return;
+            }
+            switch (_state)
+            {
+                case PluginState.Current:
+                    SetHero(Done, "RoadPro is installed and up to date", plugin + "  ·  " + hub);
+                    break;
+                case PluginState.Newer:
+                    SetHero(Done, "RoadPro is installed", plugin + ", newer than this Hub  ·  " + hub);
+                    break;
+                case PluginState.Older:
+                    SetHero(Get, "A newer RoadPro is ready to install",
+                            plugin + " installed; this Hub has plugin v" + (_available?.FriendlyVersion ?? "") + ". Press Update below.");
+                    break;
+                default:
+                    if (_damaged) SetHero(Fix, "RoadPro needs a repair", "Some of its files are missing. Press Repair below.");
+                    else SetHero(Get, "RoadPro is not installed yet", "Press Install below to add it to AutoCAD, Civil 3D and Map 3D.");
+                    break;
+            }
+        }
+
+        private void SetHero(string glyph, string title, string text)
+        {
+            HeroIcon.Text = glyph;
+            HeroTitle.Text = title;
+            HeroText.Text = text;
         }
 
         private void RefreshAutoCad()
@@ -125,11 +166,12 @@ namespace RoadPro.Hub
             Banner.Visibility = notes.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        /// <summary>The status tag ("UP TO DATE"): kind is Good, Warn, Bad or None (App.xaml).</summary>
         private void SetPill(string text, string kind)
         {
-            StateText.Text = text;
-            StateText.Foreground = (Brush)FindResource(kind);
-            StatePill.Background = (Brush)FindResource(kind + "Soft");
+            StateText.Text = text.ToUpperInvariant();
+            StateText.Foreground = (Brush)FindResource(kind + "OnFill");
+            StatePill.Background = (Brush)FindResource(kind + "Fill");
         }
 
         private static bool IsAutoCadRunning()
@@ -221,6 +263,7 @@ namespace RoadPro.Hub
                     UpdateText.Foreground = (Brush)FindResource("Good");
                     break;
             }
+            RefreshHero();
         }
 
         private async void OnUpdateNow(object sender, RoutedEventArgs e)
