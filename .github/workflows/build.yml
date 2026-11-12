@@ -35,8 +35,12 @@ jobs:
         id: ver
         shell: pwsh
         run: |
-          $v = (Get-Content version.txt -Raw).Trim()
-          if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "version.txt must look like 1.0.0 (found '$v')" }
+          # the release's tag is the version: publish a release tagged v3.6.3 and the setup and
+          # the Hub are 3.6.3, with nothing to edit first. Other builds (pull requests, main) use
+          # version.txt, the last version released.
+          if ("${{ github.ref }}" -like "refs/tags/v*") { $v = "${{ github.ref_name }}".Substring(1) }
+          else { $v = (Get-Content version.txt -Raw).Trim() }
+          if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "The version must look like 3.6.2 (found '$v'): tag the release v3.6.2" }
           [xml]$pc = Get-Content plugin/RoadPro.bundle/PackageContents.xml
           $pv = $pc.ApplicationPackage.AppVersion
           "version=$v" >> $env:GITHUB_OUTPUT
@@ -46,7 +50,7 @@ jobs:
       - name: Check versions match
         shell: pwsh
         run: |
-          # release version (version.txt) = setup + Hub; the plugin has its own version:
+          # release version (the tag, or version.txt) = setup + Hub; the plugin has its own version:
           # PackageContents.xml AppVersion, ComponentEntry Version and *rp:ver* must agree
           $v = '${{ steps.ver.outputs.version }}'; $pv = '${{ steps.ver.outputs.plugin }}'
           [xml]$pc = Get-Content plugin/RoadPro.bundle/PackageContents.xml
@@ -56,7 +60,6 @@ jobs:
           $short = ($pv -replace '\.0$', '')
           if ($lsp -notmatch ('\(setq \*rp:ver\* "' + [regex]::Escape($short) + '"\)')) { throw "RoadPro.lsp *rp:ver* is not $short (PackageContents.xml says $pv)" }
           if (-not (Test-Path ("docs/" + [IO.Path]::GetFileName($pc.ApplicationPackage.HelpFile)))) { throw "HelpFile $($pc.ApplicationPackage.HelpFile) is not in docs/" }
-          if ("${{ github.ref }}" -like "refs/tags/v*" -and "${{ github.ref_name }}" -ne "v$v") { throw "Tag ${{ github.ref_name }} does not match version.txt ($v)" }
           Write-Host "Release $v, plugin $pv - versions consistent"
 
       - name: Unit tests
