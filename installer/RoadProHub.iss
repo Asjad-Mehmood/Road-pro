@@ -1,5 +1,5 @@
 ; RoadPro Hub - Windows setup (Inno Setup 6)
-; Build:  ISCC.exe /DAppVersion=1.0.0 installer\RoadProHub.iss
+; Build:  ISCC.exe /DAppVersion=3.6.2 installer\RoadProHub.iss
 ; Expects the published Hub in ..\build\hub (see .github/workflows/build.yml).
 
 #ifndef AppVersion
