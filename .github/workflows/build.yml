@@ -111,6 +111,61 @@ jobs:
           git checkout -- plugin
           Get-ChildItem test-next
 
+      - name: Guide screenshots (setup wizard and Hub, clean PC)
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force screenshots | Out-Null
+          Add-Type -AssemblyName System.Drawing
+          Add-Type @"
+          using System; using System.Runtime.InteropServices;
+          public static class Win2 { [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
+            [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+            public struct RECT { public int L, T, R, B; } }
+          "@
+          function ShotH($h, $file) {
+            if (-not $h -or $h -eq [IntPtr]::Zero) { Write-Host "no window for $file"; return }
+            [Win2]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Milliseconds 800
+            $r = New-Object Win2+RECT; [Win2]::GetWindowRect($h, [ref]$r) | Out-Null
+            $bmp = New-Object System.Drawing.Bitmap ([Math]::Max(100, $r.R - $r.L)), ([Math]::Max(100, $r.B - $r.T))
+            [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($r.L, $r.T, 0, 0, $bmp.Size)
+            $bmp.Save("screenshots/$file", [System.Drawing.Imaging.ImageFormat]::Png); Write-Host "saved $file"
+          }
+          function Wiz { Get-Process | Where-Object { $_.MainWindowTitle -like 'Setup - RoadPro*' } | Select-Object -First 1 }
+          $v = '${{ steps.ver.outputs.version }}'
+          $setupV = Get-ChildItem installer/Output/*.exe | Select-Object -First 1
+          # the Hub opened at the end should show "up to date": local feed for this same version
+          New-Item -ItemType Directory -Force test-cur | Out-Null
+          $hash = (Get-FileHash $setupV.FullName -Algorithm SHA256).Hash.ToLower()
+          $m = [ordered]@{ version = $v; released = (Get-Date -Format 'yyyy-MM-dd'); setupUrl = ([Uri]$setupV.FullName).AbsoluteUri; sha256 = $hash; size = $setupV.Length; notes = "RoadPro $v" }
+          $m | ConvertTo-Json | Set-Content test-cur/update.json -Encoding utf8
+          $env:ROADPRO_UPDATE_MANIFEST = ([Uri](Resolve-Path test-cur/update.json).Path).AbsoluteUri
+          $ws = New-Object -ComObject WScript.Shell
+          Start-Process $setupV.FullName | Out-Null
+          for ($i = 0; $i -lt 40 -and -not (Wiz); $i++) { Start-Sleep 1 }
+          Start-Sleep 2; $w = Wiz
+          ShotH $w.MainWindowHandle 'Setup_1_licence.png'
+          $ws.AppActivate($w.Id) | Out-Null; Start-Sleep 1; $ws.SendKeys('%a'); Start-Sleep 1; $ws.SendKeys('{ENTER}'); Start-Sleep 2
+          ShotH (Wiz).MainWindowHandle 'Setup_2_folder.png'
+          $ws.SendKeys('{ENTER}'); Start-Sleep 2
+          ShotH (Wiz).MainWindowHandle 'Setup_3_tasks.png'
+          $ws.SendKeys('{ENTER}'); Start-Sleep 2
+          ShotH (Wiz).MainWindowHandle 'Setup_4_ready.png'
+          $ws.SendKeys('{ENTER}'); Start-Sleep 25
+          ShotH (Wiz).MainWindowHandle 'Setup_5_finished.png'
+          $ws.SendKeys('{ENTER}')
+          for ($i = 0; $i -lt 30 -and -not (Get-Process RoadProHub -ErrorAction SilentlyContinue | Where-Object MainWindowHandle -ne 0); $i++) { Start-Sleep 1 }
+          Start-Sleep 8
+          $hub = Get-Process RoadProHub -ErrorAction SilentlyContinue | Where-Object MainWindowHandle -ne 0 | Select-Object -First 1
+          if ($hub) { ShotH $hub.MainWindowHandle 'RoadProHub_main.png'; Stop-Process -Id $hub.Id -Force }
+          # leave a clean PC for the next step
+          $app = Join-Path $env:LOCALAPPDATA 'Programs\RoadPro Hub'
+          $un = Get-ChildItem "$app\unins*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($un) { Start-Process $un.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait }
+          for ($i = 0; $i -lt 60 -and (Test-Path "$app\RoadProHub.exe"); $i++) { Start-Sleep 1 }
+          Remove-Item -Recurse -Force (Join-Path $env:LOCALAPPDATA 'RoadPro Hub') -ErrorAction SilentlyContinue
+          Remove-Item Env:\ROADPRO_UPDATE_MANIFEST
+
       - name: Test setup, automatic update and uninstall
         shell: pwsh
         run: |
