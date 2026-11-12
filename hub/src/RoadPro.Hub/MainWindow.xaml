@@ -27,9 +27,6 @@
                     <TextBlock Margin="0,2,0,0">
                         <Hyperlink NavigateUri="https://www.exceltokml.com/" RequestNavigate="OnNavigate" Foreground="#F2B33D">www.exceltokml.com</Hyperlink>
                     </TextBlock>
-                    <TextBlock Margin="0,12,0,0">
-                        <Hyperlink NavigateUri="https://github.com/Asjad-Mehmood/Road-pro/releases" RequestNavigate="OnNavigate" Foreground="#C9CED4">Releases on GitHub</Hyperlink>
-                    </TextBlock>
                     <TextBlock Foreground="#7A828C" Text="SurveyX Digital" Margin="0,12,0,0" />
                 </StackPanel>
                 <Grid />
