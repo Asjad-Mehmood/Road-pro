@@ -203,13 +203,21 @@
                                         <DockPanel><TextBlock Style="{StaticResource Glyph}" Text="&#xE9D9;" Margin="0,0,12,0" />
                                             <StackPanel><TextBlock Text="Test report" Style="{StaticResource DocTitle}" /><TextBlock Text="What was tested (PDF)" Style="{StaticResource DocText}" /></StackPanel></DockPanel>
                                     </Button>
-                                    <Button Style="{StaticResource DocButton}" Margin="0,0,8,0" Click="OnOpenPluginFolder">
+                                    <Button Style="{StaticResource DocButton}" Margin="0,0,8,8" Click="OnOpenPluginFolder">
                                         <DockPanel><TextBlock Style="{StaticResource Glyph}" Text="&#xE8B7;" Margin="0,0,12,0" />
                                             <StackPanel><TextBlock Text="Plugin folder" Style="{StaticResource DocTitle}" /><TextBlock Text="Where AutoCAD loads RoadPro" Style="{StaticResource DocText}" /></StackPanel></DockPanel>
                                     </Button>
-                                    <Button Style="{StaticResource DocButton}" Margin="0" Click="OnOpenLog">
+                                    <Button Style="{StaticResource DocButton}" Margin="0,0,0,8" Click="OnOpenLog">
                                         <DockPanel><TextBlock Style="{StaticResource Glyph}" Text="&#xE7C3;" Margin="0,0,12,0" />
                                             <StackPanel><TextBlock Text="Log file" Style="{StaticResource DocTitle}" /><TextBlock Text="For support questions" Style="{StaticResource DocText}" /></StackPanel></DockPanel>
+                                    </Button>
+                                    <Button x:Name="ProblemButton" Style="{StaticResource DocButton}" Margin="0,0,8,0" Click="OnReportProblem">
+                                        <DockPanel><TextBlock Style="{StaticResource Glyph}" Text="&#xEBE8;" Margin="0,0,12,0" />
+                                            <StackPanel><TextBlock Text="Report a problem" Style="{StaticResource DocTitle}" /><TextBlock Text="The version is sent with it" Style="{StaticResource DocText}" /></StackPanel></DockPanel>
+                                    </Button>
+                                    <Button x:Name="LicencesButton" Style="{StaticResource DocButton}" Margin="0" Click="OnOpenLicences">
+                                        <DockPanel><TextBlock Style="{StaticResource Glyph}" Text="&#xE8F1;" Margin="0,0,12,0" />
+                                            <StackPanel><TextBlock Text="Open-source licences" Style="{StaticResource DocTitle}" /><TextBlock Text="The free software in the Hub" Style="{StaticResource DocText}" /></StackPanel></DockPanel>
                                     </Button>
                                 </UniformGrid>
                             </StackPanel>
@@ -220,7 +228,6 @@
                 <TextBlock HorizontalAlignment="Center" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,4,0,0">
                     <Run Text="Developed by" />
                     <Hyperlink NavigateUri="https://www.exceltokml.com/" RequestNavigate="OnNavigate" Foreground="{StaticResource Navy}" TextDecorations="{x:Null}">exceltokml.com</Hyperlink>
-                    <Run Text=" · SurveyX Digital" />
                 </TextBlock>
             </StackPanel>
         </ScrollViewer>
