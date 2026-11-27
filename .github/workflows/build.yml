@@ -289,7 +289,7 @@ jobs:
             sha256    = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower()
             size      = $setup.Length
             notes     = "See what is new in RoadPro $v."
-            notesUrl  = "https://www.exceltokml.com/roadpro#new"
+            notesUrl  = "https://www.surveyxdigital.com/roadpro#new"
           }
           $m | ConvertTo-Json | Set-Content installer/Output/update.json -Encoding utf8
           Get-Content installer/Output/update.json
@@ -314,7 +314,7 @@ jobs:
             $notes.TrimEnd(),
             '```',
             "",
-            "Developed by [www.exceltokml.com](https://www.exceltokml.com/)"
+            "Developed by [SurveyX Digital](https://www.surveyxdigital.com/)"
           ) -join "`n"
           Set-Content release/notes.md $body -Encoding utf8
 

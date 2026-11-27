@@ -333,7 +333,7 @@ namespace RoadPro.Hub
         private void OnReportProblem(object sender, RoutedEventArgs e)
         {
             var version = Uri.EscapeDataString(VersionText.Friendly(App.HubVersion));
-            Open("https://www.exceltokml.com/contact?topic=problem&program=roadpro&version=" + version + "&platform=Windows");
+            Open("https://www.surveyxdigital.com/contact?topic=problem&program=roadpro&version=" + version + "&platform=Windows");
         }
 
         /// <summary>THIRD-PARTY-NOTICES.txt, installed next to the Hub.</summary>

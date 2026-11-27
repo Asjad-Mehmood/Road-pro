@@ -36,8 +36,8 @@
         <Border Background="{StaticResource Card}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="20,12">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="12.5">
-                    <Hyperlink NavigateUri="https://www.exceltokml.com/" RequestNavigate="OnNavigate" Foreground="{StaticResource Navy}"
-                               TextDecorations="{x:Null}" FontWeight="SemiBold">www.exceltokml.com</Hyperlink>
+                    <Hyperlink NavigateUri="https://www.surveyxdigital.com/" RequestNavigate="OnNavigate" Foreground="{StaticResource Navy}"
+                               TextDecorations="{x:Null}" FontWeight="SemiBold">www.surveyxdigital.com</Hyperlink>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal">
                     <Border Width="34" Height="34" CornerRadius="9" ClipToBounds="True">
@@ -227,7 +227,7 @@
 
                 <TextBlock HorizontalAlignment="Center" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,4,0,0">
                     <Run Text="Developed by" />
-                    <Hyperlink NavigateUri="https://www.exceltokml.com/" RequestNavigate="OnNavigate" Foreground="{StaticResource Navy}" TextDecorations="{x:Null}">exceltokml.com</Hyperlink>
+                    <Hyperlink NavigateUri="https://www.surveyxdigital.com/" RequestNavigate="OnNavigate" Foreground="{StaticResource Navy}" TextDecorations="{x:Null}">SurveyX Digital</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </ScrollViewer>

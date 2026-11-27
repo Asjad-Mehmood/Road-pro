@@ -5,9 +5,9 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>RoadPro.Hub.Core</RootNamespace>
     <AssemblyName>RoadPro.Hub.Core</AssemblyName>
-    <Company>exceltokml.com</Company>
+    <Company>SurveyX Digital</Company>
     <Product>RoadPro Hub</Product>
-    <Copyright>Copyright © 2026 exceltokml.com</Copyright>
+    <Copyright>Copyright © 2026 SurveyX Digital</Copyright>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
