@@ -83,8 +83,8 @@ and that a tampered download is refused.
 
 ## Licence
 
-Copyright © 2026 [exceltokml.com](https://www.exceltokml.com/). All rights reserved.
+Copyright © 2026 [exceltokml.com](https://www.surveyxdigital.com/). All rights reserved.
 The source is published so it can be read and checked. RoadPro is free to use; see [installer/EULA.txt](installer/EULA.txt).
 Redistribution or publishing modified copies needs written permission.
 
-Developed by [www.exceltokml.com](https://www.exceltokml.com/) · SurveyX Digital
+Developed by [www.exceltokml.com](https://www.surveyxdigital.com/) · SurveyX Digital

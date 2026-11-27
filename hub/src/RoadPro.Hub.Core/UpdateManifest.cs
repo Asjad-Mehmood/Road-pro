@@ -36,7 +36,7 @@ namespace RoadPro.Hub.Core
         public static readonly string[] TrustedHosts =
         {
             "github.com", "objects.githubusercontent.com", "release-assets.githubusercontent.com",
-            "www.exceltokml.com", "exceltokml.com"
+            "www.surveyxdigital.com", "surveyxdigital.com", "www.exceltokml.com", "exceltokml.com"
         };
 
         public static UpdateManifest Parse(string json)

@@ -1,7 +1,7 @@
 ;;;============================================================================
 ;;;  RoadPro.lsp  -  Professional Road Builder for AutoCAD
 ;;;  Version : 3.6.1                                 Date : 11-Nov-2026
-;;;  Developed by https://www.exceltokml.com/
+;;;  Developed by https://www.surveyxdigital.com/
 ;;;  Chainage inputs accept plain metres (100) or chainage format (0+100).
 ;;;  RDW / RDT with Both sides : left and right can use different chainages
 ;;;  and a different fillet radius. Every fillet / taper radius is marked on plan.
@@ -311,7 +311,7 @@
   "    : button { key = \"pave\"; label = \"Pavement : asphalt / concrete...\"; width = 44; fixed_width = true; }"
   "    : text   { key = \"psum\"; width = 80; }"
   "  }"
-  "  : text { label = \"Developed by https://www.exceltokml.com/\"; alignment = right; }"
+  "  : text { label = \"Developed by https://www.surveyxdigital.com/\"; alignment = right; }"
   "  ok_cancel;"
   "  errtile;"
   "}"))
@@ -3870,7 +3870,7 @@
   "  }"
   "  : text { label = \"Start the branch centre line ON the main road centre line and draw outward.\"; }"
   "  : text { label = \"Barricades, signs, chainage and sidewalks of the branch use your RDP settings.\"; }"
-  "  : text { label = \"Developed by https://www.exceltokml.com/\"; alignment = right; }"
+  "  : text { label = \"Developed by https://www.surveyxdigital.com/\"; alignment = right; }"
   "  ok_cancel;"
   "  errtile;"
   "}"))
@@ -5527,7 +5527,7 @@
   "  }"
   "  : row { : button { key = \"check\"; label = \"Check layout\"; width = 16; fixed_width = true; }"
   "          : text { label = \"Lane counts are indicative, not an engineering approval.\"; } }"
-  "  : text { label = \"Developed by https://www.exceltokml.com/\"; alignment = right; }"
+  "  : text { label = \"Developed by https://www.surveyxdigital.com/\"; alignment = right; }"
   "  ok_cancel;"
   "  errtile;"
   "}"))
@@ -5826,7 +5826,7 @@
                        "    <Metric areaUnit=\"squareMeter\" linearUnit=\"meter\" volumeUnit=\"cubicMeter\" temperatureUnit=\"celsius\" pressureUnit=\"milliBars\" angularUnit=\"decimal degrees\" directionUnit=\"decimal degrees\"/>"
                        "  </Units>"
                        (strcat "  <Project name=\"" (rp:xml-esc (vl-filename-base (getvar "DWGNAME"))) "\"/>")
-                       (strcat "  <Application name=\"RoadPro\" desc=\"Road builder for AutoCAD - Developed by https://www.exceltokml.com/\" manufacturer=\"exceltokml.com\" version=\"" *rp:ver* "\"/>")
+                       (strcat "  <Application name=\"RoadPro\" desc=\"Road builder for AutoCAD - Developed by https://www.surveyxdigital.com/\" manufacturer=\"SurveyX Digital\" version=\"" *rp:ver* "\"/>")
                        "  <Alignments name=\"RoadPro\">"
                        (strcat "    <Alignment name=\"" (rp:xml-esc nm) "\" length=\""
                                (rtos (/ (vlax-curve-getDistAtParam obj (vlax-curve-getEndParam obj)) fac) 2 4)
@@ -6290,7 +6290,7 @@
   "    }"
   "  }"
   "  : text { label = \"Left / right are seen looking along the line from its start point.\"; }"
-  "  : text { label = \"Developed by https://www.exceltokml.com/\"; alignment = right; }"
+  "  : text { label = \"Developed by https://www.surveyxdigital.com/\"; alignment = right; }"
   "  ok_cancel;"
   "  errtile;"
   "}"))
@@ -7002,7 +7002,7 @@
   "    }"
   "  }"
   "  : text { label = \"Values follow the selected guide. Check them against the project standard (QTCM / SHC / local authority).\"; }"
-  "  : text { label = \"Developed by https://www.exceltokml.com/\"; alignment = right; }"
+  "  : text { label = \"Developed by https://www.surveyxdigital.com/\"; alignment = right; }"
   "  ok_cancel;"
   "  errtile;"
   "}"))
@@ -8018,7 +8018,7 @@
   "    }"
   "  }"
   "  : text { label = \"Asphalt (flexible) layers are set in the cross-section dialog (RDX). Quantities are neat - check them against the pavement design.\"; }"
-  "  : text { label = \"Developed by https://www.exceltokml.com/\"; alignment = right; }"
+  "  : text { label = \"Developed by https://www.surveyxdigital.com/\"; alignment = right; }"
   "  ok_cancel;"
   "  errtile;"
   "}"))
@@ -8899,7 +8899,7 @@
     (princ (strcat "\n  " (rp:pad (car c) 12) (rp:pad (cadr c) 18) (caddr c))))
   (princ (strcat "\n  Live update : " (if (rp:live-on) "ON" "OFF")
                  "   |   Installed : " (cond ((rp:bundle-p) "add-in bundle (ApplicationPlugins)") ((= (getenv (rp:instkey)) *rp:ver*) (getenv "RoadPro_instpath")) (T "no - run Install_RoadPro.bat or type RDINSTALL"))))
-  (princ "\n  Developed by https://www.exceltokml.com/")
+  (princ "\n  Developed by https://www.surveyxdigital.com/")
   (textscr)
   (princ))
 (defun c:RDHELP () (c:ROADHELP))
@@ -9211,6 +9211,6 @@
 (vl-catch-all-apply 'rp:autoinstall nil)
 (princ (strcat "\nRoad Pro v" *rp:ver* " loaded  (AutoCAD / Civil 3D).  RDP = build road   |   RDJ = junction / roundabout   |   RDRB = roundabout   |   RDPV = pavement (asphalt / concrete)   |   RDC = corridor   |   RDR = report   |   RDX = cross sections   |   RDLIVE = live update "
                (if (rp:live-on) "ON" "OFF") "   |   RDHELP = all commands"))
-(princ "\nDeveloped by https://www.exceltokml.com/")
+(princ "\nDeveloped by https://www.surveyxdigital.com/")
 (vl-catch-all-apply 'rp:update-notice nil)
 (princ)

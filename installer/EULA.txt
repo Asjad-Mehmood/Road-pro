@@ -18,4 +18,4 @@ Copyright (C) 2026 exceltokml.com. All rights reserved.
    ApplicationPlugins folder and its own folders). It does not collect or
    send any personal data.
 
-Developed by https://www.exceltokml.com/
+Developed by https://www.surveyxdigital.com/

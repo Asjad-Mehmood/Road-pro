@@ -7,8 +7,8 @@
 #endif
 #define AppName "RoadPro Hub"
 #define AppExe "RoadProHub.exe"
-#define Publisher "exceltokml.com"
-#define PublisherUrl "https://www.exceltokml.com/"
+#define Publisher "SurveyX Digital"
+#define PublisherUrl "https://www.surveyxdigital.com/"
 
 [Setup]
 ; never change AppId - Windows uses it to find and upgrade the installed Hub

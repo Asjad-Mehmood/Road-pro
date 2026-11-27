@@ -15,10 +15,10 @@
     <ApplicationIcon>Assets\RoadPro.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Version>3.6.2</Version>
-    <Company>exceltokml.com</Company>
+    <Company>SurveyX Digital</Company>
     <Product>RoadPro Hub</Product>
     <Description>Installs, updates and manages RoadPro for AutoCAD and Civil 3D</Description>
-    <Copyright>Copyright © 2026 exceltokml.com</Copyright>
+    <Copyright>Copyright © 2026 SurveyX Digital</Copyright>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
