@@ -66,6 +66,7 @@ Source: "..\build\hub\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs 
 Source: "..\plugin\RoadPro.bundle\*"; DestDir: "{app}\payload\RoadPro.bundle"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\docs\*"; DestDir: "{app}\payload\RoadPro.bundle\Contents\Docs"; Flags: ignoreversion
 Source: "..\docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion
+Source: "THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "RoadPro Hub"; ValueData: """{app}\{#AppExe}"" /checkupdates"; Flags: uninsdeletevalue; Tasks: autoupdate

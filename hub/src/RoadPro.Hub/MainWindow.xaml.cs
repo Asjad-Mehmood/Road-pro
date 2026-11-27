@@ -329,6 +329,19 @@ namespace RoadPro.Hub
             Open(App.Paths.LogFile);
         }
 
+        /// <summary>The website's contact form, with RoadPro, the Hub's version and Windows filled in.</summary>
+        private void OnReportProblem(object sender, RoutedEventArgs e)
+        {
+            var version = Uri.EscapeDataString(VersionText.Friendly(App.HubVersion));
+            Open("https://www.exceltokml.com/contact?topic=problem&program=roadpro&version=" + version + "&platform=Windows");
+        }
+
+        /// <summary>THIRD-PARTY-NOTICES.txt, installed next to the Hub.</summary>
+        private void OnOpenLicences(object sender, RoutedEventArgs e)
+        {
+            Open(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "THIRD-PARTY-NOTICES.txt"));
+        }
+
         private void OnNavigate(object sender, RequestNavigateEventArgs e)
         {
             Open(e.Uri.AbsoluteUri);
