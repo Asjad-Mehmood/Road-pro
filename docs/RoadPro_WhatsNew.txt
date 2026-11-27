@@ -1,6 +1,6 @@
-ROADPRO 3.6.2  -  Road Builder for AutoCAD / Civil 3D           12-Nov-2026
-RoadPro Setup and RoadPro Hub 3.6.2  |  AutoCAD plugin v3.6.1
-Developed by https://www.exceltokml.com/
+ROADPRO 3.6.3  -  Road Builder for AutoCAD / Civil 3D           27-Nov-2026
+RoadPro Setup and RoadPro Hub 3.6.3  |  AutoCAD plugin v3.6.1
+Developed by https://www.surveyxdigital.com/
 =============================================================================
 
 INSTALL
@@ -10,10 +10,16 @@ INSTALL
   Then start AutoCAD or Civil 3D and type RDP to build a road, RDHELP for
   all commands.
 
-  Version numbers: RoadPro 3.6.2 is the release (setup + RoadPro Hub).
+  Version numbers: RoadPro 3.6.3 is the release (setup + RoadPro Hub).
   The AutoCAD plugin inside keeps its own number: v3.6.1.
 
-WHAT IS NEW IN 3.6.2
+WHAT IS NEW IN 3.6.3
+  - RoadPro Hub, Documents and help: Report a problem opens the contact
+    form with the version filled in, and Open-source licences shows the
+    licences of the free software in the Hub.
+  - The AutoCAD plugin is the same v3.6.1: nothing changes in AutoCAD.
+
+FIRST IN 3.6.2
   - RoadPro Hub has a new look, the same as the Survey Toolkit: a status
     banner, cards, and clearer buttons and status tags.
   - Links go to www.exceltokml.com (no GitHub links in the Hub).
